@@ -1,0 +1,452 @@
+************ : log created on : Sunday October 04 2015 @ 19:50:54
+00:00:00.000 : [sys] running on x86 / Windows 10 x64 (version 10.0)
+00:00:00.000 : [sys] DirectX version : 4.09.00.0904
+00:00:00.000 : [sys] Command line:  C:\Program Files (x86)\Steam\steamapps\common\Euro Truck Simulator 2\bin\win_x86\eurotrucks2.exe
+00:00:00.000 : [cpu] CPU0: GenuineIntel [       Intel(R) Core(TM) i5-3570K CPU @ 3.40GHz] with 4 cores (4 threads) at ~3468MHz.
+00:00:00.000 : [sys] using 3 worker thread(s)
+00:00:00.000 : [sys] and 3 worker threads for IO.
+00:00:00.000 : [sys] using QPC / TSC invariant timer, frequency 3386477Hz
+00:00:00.000 : [mem] physical total: 8135M
+00:00:00.000 : [mem] physical avail: 5866M
+00:00:00.000 : [mem] virtual total: 4095M
+00:00:00.000 : [mem] virtual avail: 3539M
+00:00:00.000 : [mem] Trying to allocate memory pool (409600K)
+00:00:00.001 : [mem] Allocated 5 temporary loading buffer(s)
+00:00:00.005 : [steamctrl] Initialized Steam controller subsystem with config (C:/Program Files (x86)/Steam/steamapps/common/Euro Truck Simulator 2/controller.vdf)
+00:00:00.065 : [hashfs] base.scs: Mounted and validated, 49867 entries (1C1ADF18FF915613E11A795F4094E2F72E82B46C5DE6A3251987377919A8F3B)
+00:00:00.068 : [hashfs] core.scs: Mounted and validated, 5 entries (E58FAEB86FAC92320F92088ED1581CA22D14CC8E4DF09E9E12F78510AFF3111)
+00:00:00.136 : [hashfs] def.scs: Mounted and validated, 6380 entries (9EEC90BFA2BED39D2B2D8644D5464A03D8DF9F48BBCA2B6B677877437C8A1B8)
+00:00:00.182 : [hashfs] locale.scs: Mounted and validated, 168 entries (B8A658E0D7D11A531F2F70761AD639EEED03A0160B82BFAEF186FC985279C07)
+00:00:00.186 : [hashfs] base_cfg.scs: Mounted and validated, 1 entries (316B231E13D621E67B6D97A0E809427E3F37EBBC028397E948A013B527EDAF1)
+00:00:00.187 : [ufs] Home directory: 'C:/Users/basement/Documents/Euro Truck Simulator 2'.
+00:00:00.191 : exec /home/config.cfg
+00:00:00.191 : [sys] Executing /home/config.cfg ...
+00:00:00.191 : uset r_full_resolution_corrections "0"
+00:00:00.191 : uset r_force_color_shadowmaps "0"
+00:00:00.191 : uset g_mm_help_shown "0"
+00:00:00.191 : uset g_force_online_lscrs "0"
+00:00:00.191 : uset g_hw_info "1"
+00:00:00.191 : uset g_line_sort "0"
+00:00:00.191 : uset g_cargo_sort "0"
+00:00:00.191 : uset g_tooltip_delay "0.4"
+00:00:00.191 : uset g_global_force_load_selector "0"
+00:00:00.191 : uset g_desktop_fadeout "60"
+00:00:00.191 : uset g_disable_hud_activation "0"
+00:00:00.191 : uset g_show_game_elements "1"
+00:00:00.191 : uset r_wireframe "0"
+00:00:00.191 : uset g_interior_camera_zero_pitch "0"
+00:00:00.191 : uset r_segment_buffer_size "128"
+00:00:00.191 : uset r_multimon_exterior_in_aux "0"
+00:00:00.191 : uset r_multimon_interior_in_main "1"
+00:00:00.191 : uset r_multimon_rotation_aux "0"
+00:00:00.191 : uset r_multimon_rotation_right "0"
+00:00:00.191 : uset r_multimon_rotation_left "0"
+00:00:00.191 : uset r_multimon_rotation_center "0"
+00:00:00.192 : uset r_multimon_vert_offset_right "0"
+00:00:00.192 : uset r_multimon_vert_offset_left "0"
+00:00:00.192 : uset r_multimon_border_fov_right "0"
+00:00:00.192 : uset r_multimon_border_fov_left "0"
+00:00:00.192 : uset r_multimon_fov_vertical "0"
+00:00:00.192 : uset r_multimon_fov_horizontal "50"
+00:00:00.192 : uset r_multimon_mode "0"
+00:00:00.192 : uset r_use_depth_bounds "1"
+00:00:00.192 : uset r_show_light_pixel_coverage "0"
+00:00:00.192 : uset r_deferred_debug "0"
+00:00:00.192 : uset r_mirror_scale_y "1"
+00:00:00.192 : uset r_mirror_scale_x "1"
+00:00:00.192 : uset r_scale_y "1"
+00:00:00.192 : uset r_scale_x "1"
+00:00:00.192 : uset r_normal_maps "1"
+00:00:00.192 : uset r_sunshafts "1"
+00:00:00.192 : uset r_color_saturation "1.0"
+00:00:00.192 : uset r_color_yellow_blue "0.0"
+00:00:00.192 : uset r_color_magenta_green "0.0"
+00:00:00.192 : uset r_color_cyan_red "0.0"
+00:00:00.192 : uset r_color_correction "1"
+00:00:00.192 : uset r_cloud_shadows "1"
+00:00:00.192 : uset r_dof_filter_size "0.5"
+00:00:00.192 : uset r_dof_transition "400.0"
+00:00:00.192 : uset r_dof_start "200.0"
+00:00:00.192 : uset r_dof "1"
+00:00:00.192 : uset r_mlaa_threshold "1.0"
+00:00:00.192 : uset r_mlaa "1"
+00:00:00.192 : uset r_hdr "1"
+00:00:00.192 : uset r_fake_shadows "2"
+00:00:00.192 : uset r_sun_shadow_texture_size "4096"
+00:00:00.192 : uset r_sun_shadow_quality "4"
+00:00:00.192 : uset r_mirror_view_distance "160"
+00:00:00.192 : uset r_deferred_mirrors "1"
+00:00:00.192 : uset r_deferred "1"
+00:00:00.193 : uset r_nowmi "0"
+00:00:00.193 : uset r_startup_progress "0"
+00:00:00.193 : uset r_setup_done "1"
+00:00:00.193 : uset r_gamma "1.0"
+00:00:00.193 : uset r_manual_stereo_buffer_scale "1.0"
+00:00:00.193 : uset r_manual_stereo_ui_fov_game "100"
+00:00:00.193 : uset r_manual_stereo_ui_fov "80"
+00:00:00.193 : uset r_manual_stereo_ui_dist_game "0.5"
+00:00:00.193 : uset r_manual_stereo_ui_dist "0.8"
+00:00:00.193 : uset r_manual_stereo_in_menu "1"
+00:00:00.193 : uset r_nv_stereo_mode "2"
+00:00:00.193 : uset r_minimal_unfinished_frames "0"
+00:00:00.193 : uset r_no_frame_tracking "0"
+00:00:00.193 : uset r_msaa "0"
+00:00:00.193 : uset r_fullscreen "1"
+00:00:00.193 : uset r_mode "1920x1080x32x0"
+00:00:00.193 : uset r_path ""
+00:00:00.193 : uset r_device "dx9"
+00:00:00.193 : uset i_virtual_cursor_speed "500.0"
+00:00:00.193 : uset g_trackir "1"
+00:00:00.193 : uset g_pedestrian "1"
+00:00:00.193 : uset g_light_span_factor "1"
+00:00:00.193 : uset g_light_distance_factor "1"
+00:00:00.193 : uset g_vehicle_flare_lights "1"
+00:00:00.193 : uset g_auto_traffic_headlights "1"
+00:00:00.193 : uset g_traffic "1"
+00:00:00.193 : uset g_kdop_preview "0"
+00:00:00.193 : uset g_screenshot_on_bug "0"
+00:00:00.193 : uset g_city_name_move "0"
+00:00:00.193 : uset g_developer "0"
+00:00:00.193 : uset g_steam_rich_presence "1"
+00:00:00.193 : uset g_steam_browser "1"
+00:00:00.193 : uset g_steam_screenshots "2"
+00:00:00.193 : uset g_artist_id "0"
+00:00:00.193 : uset g_save_format "0"
+00:00:00.193 : uset g_flyspeed "100.0"
+00:00:00.193 : uset g_online_loading_screens "1"
+00:00:00.193 : uset g_news "1"
+00:00:00.193 : uset g_colbox "0"
+00:00:00.194 : uset g_radio_mode "2"
+00:00:00.194 : uset g_ignore_low_fps "0"
+00:00:00.194 : uset g_truck_light_quality "1"
+00:00:00.194 : uset g_truck_light_specular "1"
+00:00:00.194 : uset g_gfx_all_scales "0"
+00:00:00.194 : uset g_gfx_advanced "0"
+00:00:00.194 : uset g_gfx_quality "-1"
+00:00:00.194 : uset g_hq_3d_scale "0.0"
+00:00:00.194 : uset g_hq_3d_screenshot "0"
+00:00:00.194 : uset g_menu_aa_limit "8"
+00:00:00.194 : uset g_additional_water_fov "20.0f"
+00:00:00.194 : uset g_rain_reflect_hookups "1"
+00:00:00.194 : uset g_rain_reflect_actor "1"
+00:00:00.194 : uset g_rain_reflect_traffic "1"
+00:00:00.194 : uset g_rain_reflect_cache "1"
+00:00:00.194 : uset g_rain_reflection "3"
+00:00:00.194 : uset g_reflection "3"
+00:00:00.194 : uset g_grass_density "2"
+00:00:00.194 : uset g_veg_detail "2"
+00:00:00.194 : uset g_minicon "0"
+00:00:00.194 : uset g_console "0"
+00:00:00.194 : uset g_texture_usage_stats "0"
+00:00:00.194 : uset g_fps "0"
+00:00:00.194 : uset g_stream_exts ".ogg;.mp3"
+00:00:00.194 : uset r_vsync "1"
+00:00:00.194 : uset r_anisotropy_factor "1"
+00:00:00.194 : uset r_texture_detail "0"
+00:00:00.194 : uset t_averaging_window_length "20"
+00:00:00.205 : [lang] Language autodetection: 409
+00:00:00.212 : Selected language: en_gb
+00:00:00.212 : Euro Truck Simulator 2 init ver.1.21.1s (rev. a30881e06d5d)
+00:00:00.218 : [net]  LOG INFO: Started
+00:00:00.223 : Setting UI reference mode to: 1440x900...
+00:00:00.223 : [gfx] Selected rendering device: dx9
+00:00:00.266 : [dx9] NVAPI initialized
+00:00:00.326 : [dx9] Direct3D9Ex detected.
+00:00:00.326 : [dx9] Number of adapters found: 1
+00:00:00.366 : [dx9] Adapter #0: NVIDIA GeForce GTX 560  / 973 (1024) MB (nvd3dum.dll, 10.18.13.5560, 20150806)
+00:00:00.367 : [dx9] Using SM3X rendering path
+00:00:00.368 : [gfx] Trying to set 1920x1080 32bpp 59Hz (fullscreen)
+00:00:01.134 : [dx9] SLI not found.
+00:00:01.135 : [dx9] Stereo fully allowed.
+00:00:01.135 : [dx9] Unable to initialize stereo (-140), the stereo driver might be not installed
+00:00:01.135 : [dx9] D3D9 device sucessfully created [HWVP]
+00:00:01.249 : [al] device: OpenAL Soft
+00:00:01.249 : [al] context extensions: ALC_ENUMERATE_ALL_EXT ALC_ENUMERATION_EXT ALC_EXT_CAPTURE ALC_EXT_DEDICATED ALC_EXT_disconnect ALC_EXT_EFX ALC_EXT_thread_local_context ALC_SOFT_loopback
+00:00:01.257 : [al] vendor: OpenAL Community
+00:00:01.257 : [al] version: 1.1 ALSOFT 1.14
+00:00:01.257 : [al] renderer: OpenAL Soft
+00:00:01.257 : [al] extensions: AL_EXT_ALAW AL_EXT_DOUBLE AL_EXT_EXPONENT_DISTANCE AL_EXT_FLOAT32 AL_EXT_IMA4 AL_EXT_LINEAR_DISTANCE AL_EXT_MCFORMATS AL_EXT_MULAW AL_EXT_MULAW_MCFORMATS AL_EXT_OFFSET AL_EXT_source_distance_model AL_LOKI_quadriphonic AL_SOFT_buffer_samples AL_SOFT_buffer_sub_data AL_SOFTX_deferred_updates AL_SOFT_direct_channels AL_SOFT_loop_points
+00:00:01.257 : [snd] Started sound update thread
+00:00:01.263 : [di8] Initializing device '@@keyboard@@' as 'keyboard'
+00:00:01.268 : [di8] Initializing device '@@i_mouse@@' as 'mouse'
+00:00:01.274 : [di8] Initializing device 'Logitech Extreme 3D Pro USB' as '{D8C71190-6A9E-11E5-8001-444553540000}|{C215046D-0000-0000-0000-504944564944}'
+00:00:01.275 : [di8] Initializing device 'Logitech Driving Force GT USB' as '{B7C8A7A0-67CF-11E5-8002-444553540000}|{C29A046D-0000-0000-0000-504944564944}'
+00:00:01.276 : [di8] FF Constant force supported
+00:00:01.276 : [di8] FF Ramp force supported
+00:00:01.276 : [di8] FF Square force supported
+00:00:01.277 : [di8] FF Sine force supported
+00:00:01.277 : [di8] FF Triangle force supported
+00:00:01.277 : [di8] FF SawtoothUp force supported
+00:00:01.277 : [di8] FF SawtoothDown force supported
+00:00:01.277 : [di8] FF Spring force supported
+00:00:01.277 : [di8] FF Damper force supported
+00:00:01.277 : [di8] FF Inertia force supported
+00:00:01.277 : [di8] FF Friction force supported
+00:00:01.277 : [di8] FF Axis 'x' 'Wheel axis' reports force 10N with resolution of 256
+00:00:01.326 : [hashfs] dlc_christmas.scs: Mounted and validated, 357 entries (D107007C20A37411C637A339741A972B33973BEF39FBD6739A3295C72156C19)
+00:00:01.714 : [hashfs] dlc_east.scs: Mounted and validated, 859 entries (C2E8C2DECB0BF16D8CFEAD8866C9B4B74530317E6DE150A25641DB260641326)
+00:00:01.845 : [hashfs] dlc_trailers.scs: Mounted and validated, 604 entries (CE2188461AEF0CB9B4B6BF5EE108E40EC7B5C29FF133C80F7E03BAF9D0B35F9)
+00:00:01.852 : [hashfs] dlc_winter.scs: Mounted and validated, 461 entries (F28DD1B17AB828F9B5FFD4DC94DF70C13795FB27DB858C43A498996C1B03673)
+00:00:01.868 : dispatch
+00:00:01.868 : exit
+00:00:07.961 : [ui] Controller setup start
+00:00:07.963 : [inp] Classifying devices
+00:00:07.963 : [inp] Analyzing "Logitech Extreme 3D Pro USB" "di8.'{D8C71190-6A9E-11E5-8001-444553540000}|{C215046D-0000-0000-0000-504944564944}'"
+00:00:07.964 : [inp] Applying input.clutch.default
+00:00:07.964 : [inp] Applying input.look.default
+00:00:07.964 : [inp] Applying input.gearbox.updown.default
+00:00:07.965 : [inp] Applying input.gearbox.drive.default
+00:00:07.965 : [inp] Applying input.gearbox.hshifter.default
+00:00:07.965 : [inp] Classified as: unknown
+00:00:07.965 : [inp] Analyzing "Logitech Driving Force GT USB" "di8.'{B7C8A7A0-67CF-11E5-8002-444553540000}|{C29A046D-0000-0000-0000-504944564944}'"
+00:00:07.966 : [inp] Applying input.steer.logitech.driving.force.gt
+00:00:07.966 : [inp] Applying input.pedals.logitech.driving.force.gt.combined
+00:00:07.967 : [inp] Applying input.clutch.default
+00:00:07.967 : [inp] Applying input.look.default
+00:00:07.967 : [inp] Applying input.gearbox.updown.logitech.driving.force.gt
+00:00:07.968 : [inp] Applying input.gearbox.drive.default
+00:00:07.968 : [inp] Applying input.gearbox.hshifter.default
+00:00:07.968 : [inp] Applying input.info.logitech.driving.force.gt
+00:00:07.969 : [inp] Classified as: wheel
+00:00:07.970 : [ui] Ignoring '{D8C71190-6A9E-11E5-8001-444553540000}|{C215046D-0000-0000-0000-504944564944}' ('Logitech Extreme 3D Pro USB') from UI control: blacklisted
+00:00:07.970 : [ui] Controller setup done
+00:00:07.999 : mm_flush_repeatedly
+00:00:08.007 : [hashfs] dlc_christmas.scs: Mounted and validated, 357 entries (D107007C20A37411C637A339741A972B33973BEF39FBD6739A3295C72156C19)
+00:00:08.110 : [hashfs] dlc_east.scs: Mounted and validated, 859 entries (C2E8C2DECB0BF16D8CFEAD8866C9B4B74530317E6DE150A25641DB260641326)
+00:00:08.144 : [hashfs] dlc_trailers.scs: Mounted and validated, 604 entries (CE2188461AEF0CB9B4B6BF5EE108E40EC7B5C29FF133C80F7E03BAF9D0B35F9)
+00:00:08.148 : [hashfs] dlc_winter.scs: Mounted and validated, 461 entries (F28DD1B17AB828F9B5FFD4DC94DF70C13795FB27DB858C43A498996C1B03673)
+00:00:08.151 : uset s_sfx_enabled "1"
+00:00:08.151 : uset s_music_enabled "1"
+00:00:08.151 : uset s_sfx_volume "1.0"
+00:00:08.151 : uset s_radio_volume "1.0"
+00:00:08.151 : uset s_music_volume "0.8"
+00:00:08.151 : uset s_master_volume "1.0"
+00:00:08.151 : uset s_reverse_stereo "0"
+00:00:08.152 : uset g_force_economy_reset "0"
+00:00:08.152 : uset g_force_load_selector "0"
+00:00:08.152 : uset g_autoload_ignore_autosave "0"
+00:00:08.152 : uset g_start_in_truck "0"
+00:00:08.152 : uset g_input_configured "1"
+00:00:08.152 : uset g_income_factor "1.0"
+00:00:08.152 : uset g_currency "0"
+00:00:08.152 : uset g_bad_weather_factor "0.07"
+00:00:08.152 : uset g_save_idx "2"
+00:00:08.152 : uset g_adviser "2"
+00:00:08.152 : uset g_desktop_tutorial "1"
+00:00:08.152 : uset g_tutorial "1"
+00:00:08.152 : uset g_fatigue "1"
+00:00:08.152 : uset g_police "1"
+00:00:08.152 : uset g_subtitles "0"
+00:00:08.152 : uset g_clock_24 "1"
+00:00:08.152 : uset g_hmd_no_3d_background "0"
+00:00:08.152 : uset g_hmd_no_special_menu "0"
+00:00:08.152 : uset g_hmd_reduced_cabin_movement "1"
+00:00:08.152 : uset g_hmd_no_artifical_movement "0"
+00:00:08.152 : uset i_oculus_eye_protrusion "0.09"
+00:00:08.152 : uset i_oculus_eye_height "0.15"
+00:00:08.152 : uset i_hmd_max_prediction "0.1"
+00:00:08.152 : uset i_hmd_min_prediction "0.0"
+00:00:08.152 : uset s_interior_volume "1.0"
+00:00:08.152 : uset s_rumble_enabled "1"
+00:00:08.152 : uset s_reverse_enabled "1"
+00:00:08.152 : uset g_toy_physics "1"
+00:00:08.152 : uset g_cam_blinker "0"
+00:00:08.152 : uset g_cam_physics_value "1.0"
+00:00:08.152 : uset g_cam_physics "1"
+00:00:08.152 : uset g_cam_steering_reverse "1.0"
+00:00:08.152 : uset g_cam_steering_value "1.0"
+00:00:08.152 : uset g_cam_steering "0"
+00:00:08.152 : uset g_cruise_control_smart "0.0"
+00:00:08.152 : uset g_cruise_control_grid "5.0"
+00:00:08.152 : uset g_throttle_auto_shift "0"
+00:00:08.152 : uset g_pedal_clutch_range "1.0"
+00:00:08.152 : uset g_fuel_simulation "1"
+00:00:08.152 : uset g_hardcore_simulation "1"
+00:00:08.152 : uset g_reg_setting ""
+00:00:08.152 : uset g_brake_light_all "1"
+00:00:08.153 : uset g_use_speed_limiter "0"
+00:00:08.153 : uset g_hud_speed_limit "1"
+00:00:08.153 : uset g_axle_drop_auto "0"
+00:00:08.153 : uset g_engine_start_auto "0"
+00:00:08.153 : uset g_motor_brake_auto "0"
+00:00:08.153 : uset g_retarder_auto "0"
+00:00:08.153 : uset g_trailer_stability "0.5"
+00:00:08.153 : uset g_brake_intensity "1.0"
+00:00:08.153 : uset g_steer_autocenter "1"
+00:00:08.153 : uset g_gallon "0"
+00:00:08.153 : uset g_fahrenheit "0"
+00:00:08.153 : uset g_pounds "kg"
+00:00:08.153 : uset g_mph "1"
+00:00:08.153 : uset g_hshifter_synchronized "1"
+00:00:08.153 : uset g_hshifter_layout_shifting "1"
+00:00:08.153 : uset g_hshifter_layout "3"
+00:00:08.153 : uset g_trans "1"
+00:00:08.153 : uset g_lang_set "1"
+00:00:08.153 : uset g_lang "en_gb"
+00:00:08.153 : uset g_cutscenes "1"
+00:00:10.894 : uset s_sfx_enabled "1"
+00:00:10.894 : uset s_music_enabled "1"
+00:00:10.894 : uset s_sfx_volume "1.0"
+00:00:10.894 : uset s_radio_volume "1.0"
+00:00:10.894 : uset s_music_volume "0.8"
+00:00:10.894 : uset s_master_volume "1.0"
+00:00:10.895 : uset s_reverse_stereo "0"
+00:00:10.895 : uset g_force_economy_reset "0"
+00:00:10.895 : uset g_force_load_selector "0"
+00:00:10.895 : uset g_autoload_ignore_autosave "0"
+00:00:10.895 : uset g_start_in_truck "0"
+00:00:10.895 : uset g_input_configured "1"
+00:00:10.895 : uset g_income_factor "1.0"
+00:00:10.895 : uset g_currency "0"
+00:00:10.895 : uset g_bad_weather_factor "0.07"
+00:00:10.895 : uset g_save_idx "2"
+00:00:10.895 : uset g_adviser "2"
+00:00:10.895 : uset g_desktop_tutorial "1"
+00:00:10.895 : uset g_tutorial "1"
+00:00:10.895 : uset g_fatigue "1"
+00:00:10.895 : uset g_police "1"
+00:00:10.895 : uset g_subtitles "0"
+00:00:10.895 : uset g_clock_24 "1"
+00:00:10.895 : uset g_hmd_no_3d_background "0"
+00:00:10.895 : uset g_hmd_no_special_menu "0"
+00:00:10.895 : uset g_hmd_reduced_cabin_movement "1"
+00:00:10.895 : uset g_hmd_no_artifical_movement "0"
+00:00:10.895 : uset i_oculus_eye_protrusion "0.09"
+00:00:10.895 : uset i_oculus_eye_height "0.15"
+00:00:10.895 : uset i_hmd_max_prediction "0.1"
+00:00:10.896 : uset i_hmd_min_prediction "0.0"
+00:00:10.896 : uset s_interior_volume "1.0"
+00:00:10.896 : uset s_rumble_enabled "1"
+00:00:10.896 : uset s_reverse_enabled "1"
+00:00:10.896 : uset g_toy_physics "1"
+00:00:10.896 : uset g_cam_blinker "0"
+00:00:10.896 : uset g_cam_physics_value "1.0"
+00:00:10.896 : uset g_cam_physics "1"
+00:00:10.896 : uset g_cam_steering_reverse "1.0"
+00:00:10.896 : uset g_cam_steering_value "1.0"
+00:00:10.896 : uset g_cam_steering "0"
+00:00:10.896 : uset g_cruise_control_smart "0.0"
+00:00:10.896 : uset g_cruise_control_grid "5.0"
+00:00:10.896 : uset g_throttle_auto_shift "0"
+00:00:10.896 : uset g_pedal_clutch_range "1.0"
+00:00:10.896 : uset g_fuel_simulation "1"
+00:00:10.896 : uset g_hardcore_simulation "1"
+00:00:10.896 : uset g_reg_setting ""
+00:00:10.896 : uset g_brake_light_all "1"
+00:00:10.896 : uset g_use_speed_limiter "0"
+00:00:10.896 : uset g_hud_speed_limit "1"
+00:00:10.896 : uset g_axle_drop_auto "0"
+00:00:10.896 : uset g_engine_start_auto "0"
+00:00:10.896 : uset g_motor_brake_auto "0"
+00:00:10.896 : uset g_retarder_auto "0"
+00:00:10.896 : uset g_trailer_stability "0.5"
+00:00:10.896 : uset g_brake_intensity "1.0"
+00:00:10.896 : uset g_steer_autocenter "1"
+00:00:10.896 : uset g_gallon "0"
+00:00:10.896 : uset g_fahrenheit "0"
+00:00:10.896 : uset g_pounds "kg"
+00:00:10.896 : uset g_mph "1"
+00:00:10.896 : uset g_hshifter_synchronized "1"
+00:00:10.896 : uset g_hshifter_layout_shifting "1"
+00:00:10.897 : uset g_hshifter_layout "3"
+00:00:10.897 : uset g_trans "1"
+00:00:10.897 : uset g_lang_set "1"
+00:00:10.897 : uset g_lang "en_gb"
+00:00:10.897 : uset g_cutscenes "1"
+00:00:10.909 : New profile selected: 'Rex'
+00:00:11.327 : game
+00:00:11.514 : [bullet] Starting physics server: Bullet
+00:00:11.624 : Loaded trailers: 78
+00:00:11.626 : Loaded traffic vehicles of type 'car': 29
+00:00:11.628 : Loaded traffic vehicles of type 'truck': 22
+00:00:11.628 : Loaded traffic vehicles of type 'bus': 1
+00:00:11.629 : Loaded traffic trailers of type 'semi_trailer': 14
+00:00:11.629 : Loaded addon hookups: 16
+00:00:11.631 : Loading resource server data ....
+00:00:11.631 : Loading vegetation data ....
+00:00:11.636 : Loading road data ....
+00:00:11.639 : Loading terrain data ....
+00:00:11.643 : Loading railing data ....
+00:00:11.644 : Loading building data ....
+00:00:11.660 : Loading model data ....
+00:00:11.677 : Loading prefab data ....
+00:00:11.694 : Loading traffic rule data ....
+00:00:11.710 : Loading sign data ....
+00:00:11.738 : Loading city data ....
+00:00:11.746 : Loading traffic semaphore data ....
+00:00:11.761 : Loading traffic signs data ....
+00:00:11.794 : Loading hinges data ....
+00:00:11.811 : Loading stamp data ....
+00:00:11.827 : Loading movers data ....
+00:00:11.844 : Loading ferry data ....
+00:00:11.861 : Loading country data ....
+00:00:11.877 : Loading sound item data ....
+00:00:11.894 : Loading live stream data ....
+00:00:11.911 : Loading game condition data ....
+00:00:11.927 : Loading trigger action data ....
+00:00:11.944 : Loading cutscene data ....
+00:00:12.012 : Loading cargo data ....
+00:00:12.019 : Loading company data ....
+00:00:12.059 : Resources load time: 567ms  (175 MB)
+00:00:12.060 : Map '/map/europe.mbd' loading started ....
+00:00:12.830 : Map successfully loaded.
+00:00:12.843 : Map load time: 783ms  (0 MB)
+00:00:12.848 : Loading save '/home/profiles/526578/save/autosave/game.sii'
+00:00:13.246 : Road network navigation caching started.
+00:00:14.463 : Road network navigation caching finished.
+00:00:14.482 : Garage update started.
+00:00:14.607 : Garage update finished.
+00:00:14.609 : Economy load time: 3116ms  (7 MB)
+00:00:15.902 : Create actor: (68 MB)
+00:00:15.920 : Game init finished. (251 MB)
+00:00:21.496 : Loading save '/home/profiles/526578/save/1/game.sii'
+00:00:21.535 : Road network navigation caching started.
+00:00:22.777 : Road network navigation caching finished.
+00:00:22.781 : Garage update started.
+00:00:22.803 : Garage update finished.
+00:00:23.190 : water level unregistered (0)
+00:00:42.728 : water level unregistered (0)
+00:08:55.690 : water level unregistered (0)
+00:08:57.492 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:08:57.496 : Game has been auto-saved.
+00:13:18.003 : water level unregistered (0)
+00:14:03.120 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:14:03.124 : Game has been auto-saved.
+00:16:47.020 : Creating save-game file (/home/profiles/526578/save/autosave_job_7/game.sii) ...
+00:16:47.031 : Game has been auto-saved.
+00:19:21.162 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:19:21.168 : Game has been auto-saved.
+00:22:19.563 : water level unregistered (1)
+00:24:24.138 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:24:24.144 : Game has been auto-saved.
+00:25:50.754 : water level unregistered (0)
+00:28:11.012 : water level unregistered (0)
+00:29:28.849 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:29:28.853 : Game has been auto-saved.
+00:34:33.110 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:34:33.116 : Game has been auto-saved.
+00:39:26.910 : Creating save-game file (/home/profiles/526578/save/autosave/game.sii) ...
+00:39:26.923 : Game has been auto-saved.
+00:41:30.727 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:41:30.730 : Game has been auto-saved.
+00:41:57.939 : Creating save-game file (/home/profiles/526578/save/autosave_job_8/game.sii) ...
+00:41:57.950 : Game has been auto-saved.
+00:46:58.881 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:46:58.887 : Game has been auto-saved.
+00:47:26.946 : water level unregistered (0)
+00:51:55.932 : water level unregistered (0)
+00:52:11.598 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:52:11.604 : Game has been auto-saved.
+00:55:02.041 : water level unregistered (1)
+00:57:22.799 : Creating save-game file (/home/profiles/526578/save/autosave_drive/game.sii) ...
+00:57:22.806 : Game has been auto-saved.
+01:00:01.945 : Creating save-game file (/home/profiles/526578/save/autosave/game.sii) ...
+01:00:01.956 : Game has been auto-saved.
+01:02:18.457 : Creating save-game file (/home/profiles/526578/save/1/game.sii) ...
+01:02:24.713 : quit
+01:02:24.714 : Creating save-game file (/home/profiles/526578/save/autosave/game.sii) ...
+01:02:24.735 : Game has been auto-saved.
+01:02:24.867 : water level unregistered (0)
+01:02:25.469 : [dx9] NVAPI unloaded
+01:02:25.473 : [net]  LOG INFO: Stopped
+01:02:25.573 : [sys] process shutdown

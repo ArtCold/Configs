@@ -1,0 +1,11 @@
+SiiNunit
+{
+global_input_config : _nameless.02FA.0EC0 {
+ version: 0
+ ui_whitelisted: 1
+ ui_whitelisted[0]: "di8.'{B1070440-67A5-11E5-8001-444553540000}|{C294046D-0000-0000-0000-504944564944}'"
+ ui_blacklisted: 1
+ ui_blacklisted[0]: "di8.'{D8C71190-6A9E-11E5-8001-444553540000}|{C215046D-0000-0000-0000-504944564944}'"
+}
+
+}
