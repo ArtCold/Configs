@@ -178,7 +178,12 @@
                 <input type="radio" ng-model="data.distribution" id="dt-distr1" value="Attached" ng-disabled="data.sensetive=='Yes'" /><label for="dt-distr1">Attached</label>
                 <input type="file" fileread="data.attachment" ng-show="data.distribution=='Attached'" />
                 <input type="radio" ng-model="data.distribution" id="dt-distr2" value="Email" /><label for="dt-distr2">Email</label>
-                <input type="radio" ng-model="data.distribution" id="dt-distr3" value="Hardcopy" /><label for="dt-distr3">Hardcopy</label>
+                <input type="radio" ng-model="data.distribution" id="dt-distr3" value="Hardcopy" /><label for="dt-distr3">Hardcopy</label><br />
+                <ul>
+                    <li ng-repeat="file in data.attachments">
+                        <a ng-href="{{::file.url}}">{{::file.name}}</a>
+                    </li>
+                </ul>
             </div>
 
             <!--Creator comments-->
@@ -378,13 +383,22 @@
 
             return val;
         };
-        var parseItemToData = function (item) {
+        var parseItemToData = function (item, attFiles) {
             var obj = item.get_fieldValues();
             var data = {};
             for (var key in fields) {
                 var field = fields[key];
                 var newVal = parseField(obj, field);
                 if (newVal != null) data[key] = newVal;
+            }
+            if (attFiles.get_count()) {
+                data.attachments = [];
+                for (var i = 0; i < attFiles.get_count() ; i++) {
+                    var file = attFiles.getItemAtIndex(i);
+                    var name = file.get_name();
+                    var url = file.get_serverRelativeUrl();
+                    data.attachments.push({ name: name, url: url });
+                }
             }
             return data;
         };
@@ -429,9 +443,12 @@
             var deferred = $q.defer();
             var ctx = SP.ClientContext.get_current();
             var item = ctx.get_web().get_lists().getByTitle(Session.getListTitle()).getItemById(Session.getItemId());
+            var attachmentFolder = ctx.get_web().getFolderByServerRelativeUrl('Lists/' + Session.getListTitle() + '/Attachments/' + Session.getItemId());
+            var attachmentFiles = attachmentFolder.get_files();
+            ctx.load(attachmentFiles);
             ctx.load(item);
             ctx.executeQueryAsync(function () {
-                var obj = parseItemToData(item);
+                var obj = parseItemToData(item, attachmentFiles);
                 deferred.resolve(obj);
             });
             return deferred.promise;
