@@ -137,7 +137,7 @@
 <script src="/style library/angular.min.js"></script>
 <script type="text/javascript" src="/style library/datepickr.js"></script>
 <div id="angular-app" ng-app="formExample">
-    <div ng-controller="DocumentTracker" class="maindiv">
+    <div ng-form name="dtform" ng-controller="DocumentTracker" class="maindiv">
         <div><h2>OAS Document Tracker</h2></div>
         <fieldset ng-disabled="!(!data.status || data.status=='New')" class="dt-group-wrapper">
             <div class="dt-row">
@@ -146,7 +146,7 @@
             </div>
             <div class="dt-row">
                 <span>Document Type</span>
-                <select ng-model="data.documentType" ng-options="item as item for item in data.allDocumentTypes">
+                <select ng-model="data.documentType" ng-options="item as item for item in data.allDocumentTypes" required>
                     <option ng-repeat="option in options" value="{{option}}">{{option}}</option>
                 </select>
                 <select-add-option ng-model="data.allDocumentTypes" set-variable="data.documentType" />
@@ -154,8 +154,8 @@
             <div class="dt-row">
                 <div class="dt-column dt-w15">
                     <p>Priority</p>
-                    <input type="radio" ng-model="data.priority" id="dt-prior1" value="High" /><label for="dt-prior1">High</label><br />
-                    <input type="radio" ng-model="data.priority" id="dt-prior2" value="Standart" /><label for="dt-prior2">Standart</label>
+                    <input type="radio" ng-model="data.priority" id="dt-prior1" value="High" required /><label for="dt-prior1">High</label><br />
+                    <input type="radio" ng-model="data.priority" id="dt-prior2" value="Standart" required /><label for="dt-prior2">Standart</label>
                 </div>
                 <div class="dt-column dt-w25">
                     <p>Due Date</p>
@@ -163,8 +163,8 @@
                 </div>
                 <div class="dt-column" validate-on-change>
                     <p>Does this document containt sensetive information?</p>
-                    <input type="radio" ng-model="data.sensetive" id="dt-sens1" value="Yes" /><label for="dt-sens1">Yes. This document may not be distributed through the OAS tracker application</label><br />
-                    <input type="radio" ng-model="data.sensetive" id="dt-sens2" value="No" /><label for="dt-sens2">No</label>
+                    <input type="radio" required ng-disabled="data.distribution == 'Attached'" ng-model="data.sensetive" id="dt-sens1" value="Yes" /><label for="dt-sens1">Yes. This document may not be distributed through the OAS tracker application</label><br />
+                    <input type="radio" required ng-model="data.sensetive" id="dt-sens2" value="No" /><label for="dt-sens2">No</label>
                 </div>
             </div>
             <div class="dt-row">
@@ -175,11 +175,11 @@
             <!-- Attachment and Distribution-->
             <div class="dt-row">
                 <p>Document Distribution Method</p>
-                <input type="radio" ng-model="data.distribution" id="dt-distr1" value="Attached" ng-disabled="data.sensetive=='Yes'" /><label for="dt-distr1">Attached</label>
+                <input type="radio" required ng-model="data.distribution" id="dt-distr1" value="Attached" ng-disabled="data.sensetive=='Yes'" /><label for="dt-distr1">Attached</label>
                 <input type="file" fileread="data.attachment" ng-show="data.distribution=='Attached'" />
-                <input type="radio" ng-model="data.distribution" id="dt-distr2" value="Email" /><label for="dt-distr2">Email</label>
-                <input type="radio" ng-model="data.distribution" id="dt-distr3" value="Hardcopy" /><label for="dt-distr3">Hardcopy</label><br />
-                <ul>
+                <input type="radio" required ng-model="data.distribution" id="dt-distr2" value="Email" /><label for="dt-distr2">Email</label>
+                <input type="radio" required ng-model="data.distribution" id="dt-distr3" value="Hardcopy" /><label for="dt-distr3">Hardcopy</label><br />
+                <ul ng-show="data.distribution=='Attached'">
                     <li ng-repeat="file in data.attachments">
                         <a ng-href="{{::file.url}}">{{::file.name}}</a>
                     </li>
@@ -206,7 +206,7 @@
             <div class="dt-row" ng-show="!data.status || data.status == 'New'" style="position: relative;">
                 <input type="button" ng-click="save()" value="Save" />
                 <input type="button" ng-click="cancel()" value="Cancel" />
-                <input type="button" ng-click="initiate()" value="Initiate" />
+                <input type="button" ng-click="initiate()" value="Initiate" ng-disabled="dtform.$invalid || data.distribution == 'Attached' && !(data.attachment || data.hasAttachment)" />
                 <input type="button" ng-show="data.status=='New'" ng-click="remove()" value="Remove" style="position: absolute; right: 20px;" />
             </div>
 
@@ -278,6 +278,7 @@
             'approver': { type: 'Person', name: 'Approver' },
             'approvers': { type: 'MultiPerson', name: 'Approvers' },
             'attachment': { type: 'Attachment', name: 'Attachment', readOnly: true },
+            'hasAttachment': { type: 'Boolean', name: 'Attachments', readOnly: true },
             'comments': { type: 'JsonArray', name: 'Comments' },
             'commenter': { type: 'Text', name: 'CurrentApproverName' },
             'creator': { type: 'Person', name: 'Author', readOnly: true },
@@ -289,7 +290,6 @@
             'editor': { type: 'Person', name: 'FormEditor' },
             'editorComment': { type: 'Text', name: 'EditorComment' },
             'id': { type: 'Number', name: 'ID', readOnly: true },
-            'lastAction': { type: 'Text', name: 'LastAction' },
             'priority': { type: 'Text', name: 'Priority' },
             'sensetive': { type: 'Text', name: 'isSensetive' },
             'status': { type: 'Text', name: 'Status' },
@@ -428,7 +428,7 @@
             var deferred = $q.defer();
             var ctx = SP.ClientContext.get_current();
             var item = ctx.get_web().get_lists().getByTitle(Session.getListTitle()).addItem();
-            ctx.load(item)
+            ctx.load(item);
             parseDataToItem(data, item);
             ctx.executeQueryAsync(function () {
                 console.log("Item was created!", item);
@@ -572,18 +572,9 @@
                 return $q.when([]);
             }
         ];
-        $scope.submitValidationRules = [
-            function () {
-                if ($scope.data.distribution != "Attached" && $scope.data.attachment) {
-                    delete $scope.data.attachment;
-                    $scope.$apply();
-                }
-                return $q.when([]);
-            }
-        ];
         $scope.afterQueryActions = [
             function () {
-                if ($scope.data.distribution == "Attached") { // assuming that attachment is not null due validation
+                if ($scope.data.attachment && ($scope.data.distribution == 'Attached' || Session.isEditMode() && !$scope.data.distribution)) {
                     return Soap.postItemAttachment($scope.data.attachment.filename, $scope.data.attachment.data);
                 }
                 return $q.when([]);
@@ -656,12 +647,10 @@
         };
         $scope.initiate = function () {
             $scope.data.status = "Process";
-            $scope.data.lastAction = "Initiate";
             $scope.write();
         };
         $scope.save = function () {
             $scope.data.status = "New";
-            $scope.data.lastAction = "Save";
             $scope.write();
         };
         $scope.write = function () {
@@ -670,17 +659,16 @@
                     $scope.goBackToList();
                 });
             }
-            $scope.runActions($scope.submitValidationRules);
             if (Session.isEditMode()) {
                 Utils.filterUnmodified($scope.master, $scope.data);
                 ListFactory.updateItem($scope.data).then(afterActions);
+
             } else {
                 ListFactory.createItem($scope.data).then(afterActions);
             }
         };
         $scope.remove = function () {
             $scope.data.status = "Cancelled";
-            $scope.data.lastAction = "Remove";
             $scope.write();
         };
         $scope.addComment = function (person, comment) {
