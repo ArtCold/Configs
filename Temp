@@ -140,10 +140,14 @@
     <div ng-form name="dtform" ng-controller="DocumentTracker" class="maindiv">
         <div><h2>OAS Document Tracker</h2></div>
         <fieldset ng-disabled="!(!data.status || data.status=='New')" class="dt-group-wrapper">
+            
+            <!-- Date and ID -->
             <div class="dt-row">
                 <div class="dt-column"><span>Date: </span><span>{{::data.initDate | date:'medium'}}</span></div>
                 <div class="dt-column"><span>ID: </span><span>{{::data.id}}</span></div>
             </div>
+
+            <!-- Document Type -->
             <div class="dt-row">
                 <span>Document Type</span>
                 <select ng-model="data.documentType" ng-options="item as item for item in data.allDocumentTypes" required>
@@ -151,6 +155,8 @@
                 </select>
                 <select-add-option ng-model="data.allDocumentTypes" set-variable="data.documentType" />
             </div>
+
+            <!-- Priority and Sensetive -->
             <div class="dt-row">
                 <div class="dt-column dt-w15">
                     <p>Priority</p>
@@ -161,18 +167,20 @@
                     <p>Due Date</p>
                     <datepickr ng-model="data.dueDate" />
                 </div>
-                <div class="dt-column" validate-on-change>
+                <div class="dt-column">
                     <p>Does this document containt sensetive information?</p>
                     <input type="radio" required ng-disabled="data.distribution == 'Attached'" ng-model="data.sensetive" id="dt-sens1" value="Yes" /><label for="dt-sens1">Yes. This document may not be distributed through the OAS tracker application</label><br />
                     <input type="radio" required ng-model="data.sensetive" id="dt-sens2" value="No" /><label for="dt-sens2">No</label>
                 </div>
             </div>
+
+            <!-- Title -->
             <div class="dt-row">
                 <p>Subject/Title</p>
                 <input type="text" ng-model="data.title" />
             </div>
 
-            <!-- Attachment and Distribution-->
+            <!-- Attachment and Distribution -->
             <div class="dt-row">
                 <p>Document Distribution Method</p>
                 <input type="radio" required ng-model="data.distribution" id="dt-distr1" value="Attached" ng-disabled="data.sensetive=='Yes'" /><label for="dt-distr1">Attached</label>
@@ -186,27 +194,34 @@
                 </ul>
             </div>
 
-            <!--Creator comments-->
+            <!-- Creator comments -->
             <div class="dt-row">
                 <div class="dt-column dt-w25"><span>Initiator: </span><span>{{::data.creator.name}}</span></div>
                 <div class="dt-column"><span>Initiator comments</span><input type="text" ng-model="data.creatorComment" ng-disabled="!(!data.status || data.status == 'New' && session.currentUser.name == data.creator.name)" /></div>
             </div>
 
-            <!--Editor comments-->
+            <!-- Editor comments -->
             <div class="dt-row" ng-show="session.currentUser && session.currentUser.name != data.creator.name">
                 <div class="dt-column dt-w25"><span>Editor: </span><span>{{::data.editor.name}}</span></div>
                 <div class="dt-column"><span>Editor comments</span><input type="text" ng-model="data.editorComment" /></div>
             </div>
 
-            <!--Approvers-->
+            <!-- Approvers -->
             <div class="dt-row">
                 <my-double-box ng-model="data.approvers" option-source="data.allApprovers" />
             </div>
 
+            <!-- Buttons -->
             <div class="dt-row" ng-show="!data.status || data.status == 'New'" style="position: relative;">
                 <input type="button" ng-click="save()" value="Save" />
                 <input type="button" ng-click="cancel()" value="Cancel" />
-                <input type="button" ng-click="initiate()" value="Initiate" ng-disabled="dtform.$invalid || data.distribution == 'Attached' && !(data.attachment || data.hasAttachment)" />
+                <input type="button" ng-click="initiate()" value="Initiate" ng-disabled="
+                       dtform.$invalid ||
+                       data.distribution == 'Attached' && !(data.attachment || data.hasAttachment) ||
+                       !data.dueDate ||
+                       !data.approvers ||
+                       data.approvers.length == 0
+                       " />
                 <input type="button" ng-show="data.status=='New'" ng-click="remove()" value="Remove" style="position: absolute; right: 20px;" />
             </div>
 
@@ -223,12 +238,23 @@
                         </tr>
                     </thead>
                     <tbody>
+
+                        <!-- Old Comments -->
                         <tr class="dt-rs-row">
-                            <td class="dt-rs-column">Test User</td>
+                            <td class="dt-rs-column">Example User</td>
+                            <td class="dt-rs-column">03/03/03</td>
+                            <td class="dt-rs-column"><p>Example text</p></td>
+                            <td class="dt-rs-column"></td>
+                        </tr>
+
+                        <!-- New Comment -->
+                        <tr class="dt-rs-row" ng-show="data.currentApprover.name == session.currentUser.name">
+                            <td class="dt-rs-column">{{session.currentUser.name}}</td>
                             <td class="dt-rs-column">03/03/03</td>
                             <td class="dt-rs-column"><textarea ng-model="data.newComment" cols="40" rows="3"></textarea></td>
-                            <td class="dt-rs-column"><input type="button" ng-click="addComment(data.commenter, data.newComment)" value="Sign" /></td>
+                            <td class="dt-rs-column"><input type="button" ng-click="sign()" value="Sign"/></td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -283,6 +309,7 @@
             'commenter': { type: 'Text', name: 'CurrentApproverName' },
             'creator': { type: 'Person', name: 'Author', readOnly: true },
             'creatorComment': { type: 'Text', name: 'CreatorComment' },
+            'currentApprover': { type: 'Person', name: 'CurrentApprover' },
             'initDate': { type: 'Date', name: 'Created', readOnly: true },
             'distribution': { type: 'Text', name: 'Distribution' },
             'documentType': { type: 'Text', name: 'DocumentType' },
@@ -391,15 +418,6 @@
                 var newVal = parseField(obj, field);
                 if (newVal != null) data[key] = newVal;
             }
-            if (attFiles.get_count()) {
-                data.attachments = [];
-                for (var i = 0; i < attFiles.get_count() ; i++) {
-                    var file = attFiles.getItemAtIndex(i);
-                    var name = file.get_name();
-                    var url = file.get_serverRelativeUrl();
-                    data.attachments.push({ name: name, url: url });
-                }
-            }
             return data;
         };
         var getAllItems = function (listTitle) {
@@ -439,16 +457,31 @@
             });
             return deferred.promise;
         };
+        var getAttachments = function () {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var attachmentFolder = ctx.get_web().getFolderByServerRelativeUrl('Lists/' + Session.getListTitle() + '/Attachments/' + Session.getItemId());
+            var attachmentFiles = attachmentFolder.get_files();
+            ctx.load(attachmentFiles);
+            ctx.executeQueryAsync(function () {
+               var attachments = [];
+               for (var i = 0; i < attachmentFiles.get_count() ; i++) {
+                    var file = attachmentFiles.getItemAtIndex(i);
+                    var name = file.get_name();
+                    var url = file.get_serverRelativeUrl();
+                    attachments.push({ name: name, url: url });
+                }
+                deferred.resolve(attachments);
+            });
+            return deferred.promise;
+        }
         var getItem = function () {
             var deferred = $q.defer();
             var ctx = SP.ClientContext.get_current();
             var item = ctx.get_web().get_lists().getByTitle(Session.getListTitle()).getItemById(Session.getItemId());
-            var attachmentFolder = ctx.get_web().getFolderByServerRelativeUrl('Lists/' + Session.getListTitle() + '/Attachments/' + Session.getItemId());
-            var attachmentFiles = attachmentFolder.get_files();
-            ctx.load(attachmentFiles);
             ctx.load(item);
             ctx.executeQueryAsync(function () {
-                var obj = parseItemToData(item, attachmentFiles);
+                var obj = parseItemToData(item);
                 deferred.resolve(obj);
             });
             return deferred.promise;
@@ -467,6 +500,7 @@
             fields: fields,
             getAllItems: getAllItems,
             createItem: createItem,
+            getAttachments: getAttachments,
             getItem: getItem,
             updateItem: updateItem,
             parseField: parseField,
@@ -563,15 +597,6 @@
         $scope.data = {};
         $scope.session = {};
         $scope.data.allDocumentTypes = ['PDF', 'Doc'];
-        $scope.runtimeValidationRules = [
-            function () {
-                if ($scope.data.distribution == "Attached" && $scope.data.sensetive == 'Yes') {
-                    delete $scope.data.distribution;
-                    $scope.$apply();
-                }
-                return $q.when([]);
-            }
-        ];
         $scope.afterQueryActions = [
             function () {
                 if ($scope.data.attachment && ($scope.data.distribution == 'Attached' || Session.isEditMode() && !$scope.data.distribution)) {
@@ -629,9 +654,12 @@
                 if (Session.isEditMode()) {
                     ListFactory.getItem().then(function (obj) {
                         $scope.data = angular.merge($scope.data, obj);
-                        if ($scope.data.allDocumentTypes.indexOf($scope.data.documentType) == -1) {
+                        if ($scope.data.allDocumentTypes.indexOf($scope.data.documentType) == -1)
                             $scope.data.allDocumentTypes.push($scope.data.documentType);
-                        }
+                        if ($scope.data.hasAttachment)
+                            ListFactory.getAttachments().then(function (files) {
+                                $scope.data.attachments = files;
+                            });
                         $scope.master = angular.copy($scope.data);
                         getAllApprovers();
                         getCurrentUser();
@@ -646,6 +674,7 @@
             $scope.goBackToList();
         };
         $scope.initiate = function () {
+            $scope.data.currentApprover = $scope.data.approvers[0];
             $scope.data.status = "Process";
             $scope.write();
         };
@@ -671,9 +700,9 @@
             $scope.data.status = "Cancelled";
             $scope.write();
         };
-        $scope.addComment = function (person, comment) {
-            $scope.data.comments.push({ Name: person, Comment: comment });
-            $scope.save(); // TODO: Change to Update instead of Save
+        $scope.sign = function () {
+            $scope.data.comments.push({ name: $scope.data.currentApprover.name, comment: $scope.data.newComment });
+            $scope.write(); 
         };
         $scope.initForm();
     }]);
@@ -826,17 +855,6 @@
             },
             template: '<input type="text" ng-model="newOption"></input>' +
                 '<input type="button" ng-click="addOption()" value="Add"></input>',
-        }
-    });
-    app.directive("validateOnChange", function ($parse) {
-        return {
-            link: function (scope, element, attrs) {
-                var cb = $parse(attrs.formOnChange);
-                element.on("change", function () {
-                    cb(scope);
-                    scope.validateRuntime();
-                });
-            }
         }
     });
 
