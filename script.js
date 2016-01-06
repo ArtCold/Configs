@@ -15,7 +15,6 @@ function f1() {
 				var list = lists.getItemAtIndex(i);
 				var hasUniqueAssgns = list.get_hasUniqueRoleAssignments();
 				if (hasUniqueAssgns) {
-				    console.log(list.get_title() + ' = ' + hasUniqueAssgns);
 				    var url = location.origin + list.get_defaultViewUrl();
 				    url = url.replace(/ /g, '%20');
 				    console.log('List level permissions = ' + hasUniqueAssgns, url);
@@ -40,7 +39,8 @@ function checkItems(list) {
             var hasUniqueAssgns = item.get_hasUniqueRoleAssignments();
             if (hasUniqueAssgns) {
                 var q = 'RootFolder=' + item.get_fieldValues().FileDirRef;
-                var url = location.origin + _spPageContextInfo.webServerRelativeUrl + list.get_title() + '/Forms/AllItems.aspx?' + q + '&FilterField1=ID&FilterValue1=' + item.get_id();
+                //debugger
+                var url = location.origin + list.get_defaultViewUrl() + '?' + q + '&FilterField1=ID&FilterValue1=' + item.get_id();
                 url = url.replace(/ /g, '%20');
                 console.log('item level permissions = ' + hasUniqueAssgns, url);
             }
