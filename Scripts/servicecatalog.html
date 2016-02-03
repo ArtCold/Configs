@@ -1,0 +1,552 @@
+<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+<link href='/Style Library/Service Catalog/servicecatalog.css' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="/Style Library/handlebars.js"></script>
+<div id="service-catalog-main"></div>
+<div id="sc-overlay">
+    <div class="sc-overlay-centered">
+        <div class="sc-overlay-centered">
+            <div id="sc-close-image-wrapper">
+                <img title="Full Image View">
+                <div id="sc-close-image" title="Close Image">X</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="main-template" type="text/x-handlebars-template">
+    <div id="grand-title">Service Catalog (BETA)</div>
+	<div id="sc-main">
+		<div>
+			<span id="sc-breadcrumbs">Home</span>
+			<div id="sc-container">
+				<div id="sc-sidebar">
+					<div id="sc-title"><a href="" title="Show all services">Services</a></div>
+					<ul id="sc-list-bullets"></ul>
+				</div>
+				<div id="sc-content">
+					<div id="sc-header">
+						<div id="sc-tabs">
+							<ul class="tabs primary-nav">
+								{{#each this}}
+								<li class="tabs-item" data-tab="{{@index}}">
+									<span class="tabs-link"><a href="" title="Show services under {{Title}}">{{Title}}</a></span>
+								</li>
+								{{/each}}
+							</ul>
+						</div>
+					</div>
+					<div id="sc-center"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script id="breadcrumbs-template" type="text/x-handlebars-template">
+	<a href="" id="sc-breadcrumbs-home" title="Show all services">Home</a>
+	{{#if IsCat}}
+		<span>&gt; </span><a id="sc-breadcrumbs-category" data-tab="{{Cat}}" title="Show services under {{Cat}}" href="">{{CatTitle}}</a>
+		{{#if Item}}
+			<span>&gt; </span><a href="">{{Item}}</a>
+		{{/if}}
+	{{/if}}
+</script>
+<script id="map-template" type="text/x-handlebars-template">
+	<ul class="tabs primary-nav">
+		{{#each this}}
+		<li class="map-column" data-tab="{{@key}}">
+			<ul>
+				{{#each this.Items}}
+				<li index={{@index}} class="map-item" data-id="{{this.ID}}"><a href="" title="Display information about {{this.Title}}" >{{this.Title}}</a></li>
+				{{/each}}
+			</ul>
+		</li>
+		{{/each}}
+	</ul>
+</script>
+<script id="content-template" type="text/x-handlebars-template">
+    <h2>{{Title}}</h2>
+    <br />
+    {{#if ServiceImage}}
+    <div id="sc-left-image-wrapper">
+        <img id="sc-left-image" src="{{ServiceImage}}" alt="{{Title}} image" title="{{Title}} image" />
+        <p>Click image to view full size</p>
+    </div>
+    {{/if}}
+    <div id="sc-center-top">
+        <h3>Service Description</h3>
+        <p>{{{ServiceDescription}}}</p>
+        <br />
+    </div>
+    {{#if ServiceDetails}}
+    <div id="sc-center-detail">
+        <h3>Service Details</h3>
+        <p>{{{ServiceDetails}}}</p>
+        <br />
+    </div>
+    {{/if}}
+    <div>
+    <h3>Contact Information</h3>
+    <p>{{{ContactInformation}}}</p>
+    </div>
+</script>
+<script id="splash-template" type="text/x-handlebars-template">
+    <h2>{{ServiceCategory}}</h2>
+    {{#if ServiceImage}}
+	<div id="sc-splash-image-container">
+		<img id="sc-left-image" src="{{ServiceImage}}" />
+		<p>Click image to view full size</p>
+	</div>
+    {{/if}}
+    <p>{{{ServiceDescription}}}</p>
+</script>
+<script id="item-template" type="text/x-handlebars-template">
+    {{#each this.Items}}
+    <li index={{@index}} data-id="{{this.ID}}"><a href="" title="Display information about {{this.Title}}">{{this.Title}}</a></li>
+    {{/each}}
+</script>
+<script id="settings-template" type="text/x-handlebars-template">
+    <span>List Title</span>
+    <br>
+    <input id="sc-settings-list" type="text" value="{{sc-settings-list}}">
+    <br>
+    <br>
+    <span>Admin Group ID</span>
+    <br>
+    <input id="sc-settings-group" type="text" value="{{sc-settings-group}}">
+    <br>
+    <br>
+    <input id="sc-save-btn" value="Save settings" type="button">
+    <span id="sc-settings-message"></span>
+</script>
+
+<script language="javascript" type="text/javascript">
+    var ValueFactory = function () {
+        return {
+            values: {
+                adminServiceType: "Supporting Services",
+                splash: "Splash Page"
+            },
+            keys: {
+                active: "ServiceActive",
+                category: "ServiceCategory",
+                image: "ServiceImage",
+                index: "index",
+                itemFromUrl: "ID",
+                itemTag: "li",
+                settings: "ServiceCatalogSettings",
+                skGroup: "sc-settings-group",
+                skList: "sc-settings-list",
+                type: "ServiceType",
+                users: "Users"
+            },
+            id: {
+                breadCat: "#sc-breadcrumbs-category",
+                breadHome: "#sc-breadcrumbs-home",
+                breadcrumbs: "#sc-breadcrumbs",
+                breadTemp: "#breadcrumbs-template",
+                bullets: "#sc-list-bullets",
+                centerElem: "#sc-center",
+                container: "#service-catalog-main",
+                contentTemp: "#content-template",
+                img: "#sc-left-image",
+                imgClose: "#sc-close-image",
+                itemTemp: "#item-template",
+                mainTemp: "#main-template",
+                mapTemp: "#map-template",
+                messageLabel: "#sc-settings-message",
+                popup: "#sc-overlay",
+                ribbon: "#s4-ribbonrow",
+                saveBtn: "#sc-save-btn",
+                settingsTemp: "#settings-template",
+                sidebar: "#sc-sidebar",
+                splash: "#splash-template",
+                title: "#sc-title"
+            },
+            msg: {
+                saved: "Settings saved",
+                rootLevel: "Home"
+            },
+            classes: {
+                active: "active",
+                tabs: "tabs"
+            }
+        }
+    };
+    var UserFactory = function () {
+        var _this = this;
+        _this.checkMembership = function (groupId) {
+            var defer = jQuery.Deferred();
+            try {
+                var ctx = SP.ClientContext.get_current();
+                var web = ctx.get_web();
+                var currentUser = web.get_currentUser();
+                currentUser.retrieve();
+                var allGroups = ctx.get_web().get_siteGroups();
+                var group = allGroups.getById(groupId);
+                ctx.load(group, vf.keys.users);
+                ctx.load(web);
+                ctx.executeQueryAsync(
+                    function (sender, args) {
+                        var userObject = web.get_currentUser();
+                        var userId = userObject.get_id();
+                        var found = false;
+                        var e = group.get_users().getEnumerator();
+                        while (e.moveNext()) {
+                            var user = e.get_current();
+                            if (user.get_id() == userId) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        defer.resolve(found);
+                    },
+                    function (e) {
+                        defer.resolve(false);
+                    });
+            } catch (e) {
+                defer.resolve(false);
+            }
+            return defer;
+        };
+        return _this;
+    }
+    var ServiceCatalog = function () {
+        var ctx;
+        var web;
+        var props;
+        var defaultSettings = {};
+        var vf = new ValueFactory();
+
+        defaultSettings[vf.keys.skList] = "Service Catalog";
+        defaultSettings[vf.keys.skGroup] = "5";
+
+        function getTemplate(selector) {
+            return Handlebars.compile(jQuery(selector).html());
+        }
+        function loadSettings() {
+            var defer = jQuery.Deferred();
+            ctx = SP.ClientContext.get_current();
+            web = ctx.get_web();
+            props = web.get_allProperties();
+            ctx.load(props);
+            ctx.executeQueryAsync(function () {
+                var settings = props.get_fieldValues()[vf.keys.settings];
+                settings = settings ? JSON.parse(settings) : defaultSettings;
+                defer.resolve(settings);
+            });
+            return defer;
+        }
+        function viewMode(settings) {
+            var userFactory = new UserFactory()
+            var Category = function (title) {
+                this.Items = [];
+                this.Splash = null;
+                this.Title = title;
+                return this;
+            };
+
+            function parseItems(payload) {
+                var items = payload.items;
+                var isMember = payload.isMember;
+                var arr = [];
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    if (!item[vf.keys.active]) { continue; }
+                    if (!isMember && item[vf.keys.type] == vf.values.adminServiceType) { continue; }
+                    var cat = item[vf.keys.category];
+                    var index = arr.map(function (e) { return e.Title; }).indexOf(cat);
+                    if (index < 0) {
+                        arr.push(new Category(cat));
+                        index = arr.length - 1;
+                    }
+                    
+                    item[vf.keys.image] = jQuery(item[vf.keys.image]).attr('src');
+                    if (item['Order0'] == null) { item['Order0'] = 9999; }
+                    if (item[vf.keys.type] == vf.values.splash) {
+                        arr[index].Splash = item;
+                    } else {
+                        arr[index].Items.push(item);
+                    }
+                }
+                arr.sort(function (a, b) {
+                    return a.Splash['Order0'] - b.Splash['Order0'];
+                });
+
+                for (var i = 0; i < arr.length; i++) {
+                    var subarr = arr[i].Items;
+                    subarr.sort(function (a, b) {
+                        return a['Order0'] - b['Order0'];
+                    });
+                }
+
+                console.log(arr);
+                return arr;
+            }
+            function searchToObject() {
+                var pairs = window.location.search.substring(1).split("&");
+                var obj = {};
+                for (var i in pairs) {
+                    if (pairs[i] === "") continue;
+                    var pair = pairs[i].split("=");
+                    obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                }
+                return obj;
+            }
+            function getAllItems(isMember) {
+                var x = SP.ClientContext.get_current();
+                var list = x.get_web().get_lists().getByTitle(settings[vf.keys.skList]);;
+                var query = SP.CamlQuery.createAllItemsQuery();
+                var items = list.getItems(query);
+                x.load(items);
+                x.executeQueryAsync(function () {
+                    var en = items.getEnumerator();
+                    var payload = { isMember: isMember, items: [] };
+                    while (en.moveNext()) {
+                        var item = en.get_current();
+                        var val = item.get_fieldValues();
+                        payload.items.push(val);
+                    }
+                    window.ServiceCatalog = new ServiceCatalogDisplayForm(parseItems(payload));
+                    var query = searchToObject();
+                    if (query.hasOwnProperty(vf.keys.itemFromUrl)) {
+                        window.ServiceCatalog.findItemByid(query[vf.keys.itemFromUrl]);
+                    }
+                });
+            }
+            function ServiceCatalogDisplayForm(dto) {
+                var _this = this;
+                var breadcrumbs;
+                var bullets;
+                var categories = [];
+                var center;
+                var currentItem;
+                var currentItemId = -1;
+                var currentTab;
+                var imgCloseBtn;
+                var links;
+                var popup;
+                var writeHistory = true;
+                var tabs;
+                var title;
+                var urlBase = location.origin + location.pathname;
+                var home = jQuery(vf.id.container);
+                var breadTemplate = getTemplate(vf.id.breadTemp);
+                var contentTemplate = getTemplate(vf.id.contentTemp);
+                var itemTemplate = getTemplate(vf.id.itemTemp);
+                var mainTemplate = getTemplate(vf.id.mainTemp);
+                var mapTemplate = getTemplate(vf.id.mapTemp);
+                var splashTemplate = getTemplate(vf.id.splash);
+				
+                _this.findItemByid = function(id) {
+                    var tab;
+                    var item = null;
+					
+                    tabLoop: 
+                        for (tab in dto) { // outer loop
+                            var items = dto[tab].Items;
+                            for (var i = 0; i < items.length; i++) { // inner loop
+                                if (items[i].ID == id) {
+                                    item = items[i];
+                                    break tabLoop; // break both loops and preserve current iterators value
+                                }
+                            }
+                        }
+					
+                    if (item) {
+                        selectTab(tab);
+                        showItem(id);
+                        updateBreadcrumbs();
+                    }
+                }
+				
+                function updateBreadcrumbs() {
+                    var catTitle = currentTab == null ? "" : dto[currentTab].Title;
+                    var isCat = currentTab != null;
+                    var obj = { Cat: currentTab, CatTitle: catTitle, Item: currentItem, IsCat: isCat };
+                    
+                    if (writeHistory) {
+                        var url;
+                        if (currentItemId > -1) {
+                            url = '?service=' + currentItemId;
+                        } else {
+                            url = currentTab ? '?category=' + currentTab : '';
+                        }
+                        url = urlBase + url;
+                        window.history.pushState({ 'service': currentItemId, 'category': currentTab }, "", url);
+                    }
+
+                    breadcrumbs.html(breadTemplate(obj));
+                }
+
+                function unselectAllTabs() {
+                    tabs.removeClass(vf.classes.active);
+                    currentTab = null;
+                }
+				
+                function unselectAllLinks() {
+                    links.find(vf.keys.itemTag).removeClass(vf.classes.active);
+                    currentItem = null;
+                }
+				
+                function selectTab(tabIndex) {
+                    currentItemId = -1;
+                    bullets.show();
+                    unselectAllTabs();
+                    currentTab = tabIndex;
+                    var tab = tabs.filter('[data-tab="' + currentTab + '"]');
+                    tab.addClass(vf.classes.active);
+                    var items = dto[currentTab];
+                    links.html(itemTemplate(items));
+                    var splash = dto[tabIndex].Splash;
+                    center.html(splashTemplate(splash));
+                    currentItem = null;
+                    title.find('a').text("Home");
+                }
+				
+                function showItem(id) {
+                    unselectAllLinks();
+                    currentItemId = id;
+                    var li = links.find(vf.keys.itemTag + '[data-id=' + id + ']');
+                    var index = li.attr(vf.keys.index);
+                    li.addClass(vf.classes.active);
+                    var data = dto[currentTab].Items[index];
+                    center.html(contentTemplate(data));
+                    currentItem = li.text();
+                    title.find('a').text("Home");
+                }
+
+                function extractCategories() {
+                    jQuery.each(dto, function(key, value) {
+                        categories.push(key);
+                    });				
+                }
+				
+                function showMap() {
+                    unselectAllTabs();
+                    unselectAllLinks();
+                    bullets.hide();
+                    updateBreadcrumbs();
+                    center.html(mapTemplate(dto));
+                    title.find('a').text("Services");
+                    return false;
+                }
+				
+                function onLinkClick() {
+                    var li = jQuery(this);
+                    var id = li.data('id');
+                    writeHistory = true;
+                    _this.findItemByid(id);
+                    return false;
+                }
+				
+                function onIconClick() {
+                    var url = jQuery(this).attr('src');
+                    popup.find("img").attr("src", url);
+                    popup.fadeIn(imageFadeInOutDuration);
+                }
+				
+                function onTabClick() {
+                    selectTab(jQuery(this).data("tab"));
+                    writeHistory = true;
+                    updateBreadcrumbs();
+                    return false;
+                }
+				
+                function onPopupClick() {
+                    popup.fadeOut(imageFadeInOutDuration);
+                }
+                
+                function onPopState(e, initLaunch) {
+                    if (e.state) {
+                        var nav = e.state;
+                        writeHistory = false || !!initLaunch;
+                        if (!nav.category && (!nav.service || nav.service == -1)) {
+                            showMap();
+                            updateBreadcrumbs();
+                        } else {
+                            if (nav.service > -1) {
+                                _this.findItemByid(nav.service);
+                            } else {
+                                selectTab(nav.category);
+                                updateBreadcrumbs();
+                            }
+                        }
+                    }
+                }
+				
+                function init() {
+                    home.append(mainTemplate(dto));
+
+                    breadcrumbs = jQuery(vf.id.breadcrumbs);
+                    bullets = jQuery(vf.id.bullets);
+                    center = jQuery(vf.id.centerElem);
+                    imgCloseBtn = jQuery(vf.id.imgClose);
+                    links = jQuery(vf.id.bullets);
+                    popup = jQuery(vf.id.popup);
+                    title = jQuery(vf.id.title);
+                    tabs = jQuery(vf.id.container + ' .' + vf.classes.tabs + ' ' + vf.keys.itemTag);
+
+                    breadcrumbs.on('click', vf.id.breadCat, onTabClick);
+                    breadcrumbs.on('click', vf.id.breadHome, showMap);
+                    center.on('click', vf.keys.itemTag, onLinkClick);
+                    home.on('click', vf.id.img, onIconClick);
+                    links.on('click', vf.keys.itemTag, onLinkClick);
+                    imgCloseBtn.on('click', onPopupClick);
+                    tabs.on('click', onTabClick);
+                    title.on('click', showMap);
+
+                    var nav = searchToObject();
+                    onPopState({ state: nav }, true);
+                    extractCategories();
+
+                    window.onpopstate = onPopState;
+                }
+
+                init();
+
+                return this;
+            }
+
+            userFactory.checkMembership(settings[vf.keys.skGroup]).then(getAllItems);
+        }
+        function editMode(settings) {
+
+            function saveSettings() {
+                var settings = {};
+                jQuery(vf.id.container + ' input[type=text]').each(function (k, v) {
+                    settings[v.id] = v.value;
+                })
+                props.set_item(vf.keys.settings, JSON.stringify(settings));
+                web.update();
+                ctx.executeQueryAsync(function () {
+                    var lbl = jQuery(vf.id.messageLabel);
+                    lbl.text(vf.msg.saved);
+                    window.setTimeout(function () {
+                        lbl.text("");
+                    }, 2000);
+
+                });
+            }
+
+            var template = getTemplate(vf.id.settingsTemp);
+            jQuery(vf.id.container).append(template(settings));
+            jQuery(vf.id.saveBtn).click(saveSettings);
+        }
+
+        this.init = function () {
+            loadSettings().then(SP.Ribbon.PageState.Handlers.isInEditMode() ? editMode : viewMode);
+        };
+    }
+    var CustomLoader = function (callback) {
+        if (window.navigator.userAgent.indexOf('MSIE ') > 0) {
+            jQuery('#contentRow').html("The current Internet Explorer version is not supported.");
+        } else {
+            if (typeof jQuery == 'undefined') {
+                RegisterSod('jquery.js', '/style library/jquery.js');
+                SP.SOD.executeFunc('jquery.js', 'jQuery', function (x) { });
+            }
+            SP.SOD.executeOrDelayUntilScriptLoaded(callback, "sp.ribbon.js");
+        }
+    }
+    var sc = new ServiceCatalog();
+    CustomLoader(sc.init);
+</script><head><title></title></head>
