@@ -1,4 +1,9 @@
+var pickerSelector = 'span.ms-usereditor';
+var containerSelector = 'span.ms-usereditor';
+var buttonCaption = 'Create secured folder';
 var listTitle = 'Test';
+var loginTrimStr = 'i:0#.w|';
+var usersGroupTitle = 'Data Call Users';
 
 var createButton = function (parentNode, title, action) {
     var button = document.createElement("input");
@@ -9,7 +14,7 @@ var createButton = function (parentNode, title, action) {
 };
 
 var getLoginFromPicker = function () {
-    var picker = jQuery('span.ms-usereditor').first();
+    var picker = jQuery(pickerSelector).first();
     var id = picker.attr('id');
     var inputId = id.replace('_UserField', '_UserField_hiddenSpanData')
     var hidden = jQuery('#' + inputId);
@@ -58,7 +63,7 @@ var addUserToGroup = function (login) {
     var def = jQuery.Deferred();
     var ctx = SP.ClientContext.get_current();;
     var groupCollection = ctx.get_web().get_siteGroups();
-    var visitorsGroup = groupCollection.getByName('Data Call Users');
+    var visitorsGroup = groupCollection.getByName(usersGroupTitle);
     var ensuredUser = ctx.get_web().ensureUser(login);
     var userCollection = visitorsGroup.get_users();
     var user = userCollection.addUser(ensuredUser);
@@ -83,7 +88,7 @@ var setUniquePermissions = function (id, login) {
 };
 
 var formatLogin = function (login) {
-    login = login.replace('i:0#.w|', '');
+    login = login.replace(loginTrimStr, '');
     return login;
 }
 
@@ -99,11 +104,10 @@ var dowork = function () {
 }
 
 window.onload = function () {
-    var picker = jQuery('span.ms-usereditor').first();
+    var picker = jQuery(containerSelector).first();
     var el = picker.parent();
-    createButton(el, 'Create secured folder', dowork);
+    createButton(el, buttonCaption, dowork);
 };
-
 
 // get title from input form
 // refactor 2
