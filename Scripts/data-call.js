@@ -5,11 +5,13 @@ var listTitle = 'Test';
 var loginTrimStr = 'i:0#.w|';
 var usersGroupTitle = 'Data Call Users';
 var spform;
+var btn;
 
 var createButton = function (parentNode, title, action) {
     var button = jQuery('<input type="button" value="' + title + '" class="dc-form-button"/>');
     button.on("click", action);
     jQuery(button).insertAfter(parentNode);
+    return button;
 };
 
 var createFolder = function (webRelativeUrl) {
@@ -100,21 +102,34 @@ var ensureResource = function(url, doesntExist) {
 }
 
 var provisionSecuredFolder = function () {
-    var login = spform.get('Assignee');
-    var folderTitle = spform.get('Folder Title');
-    if (!login || !folderTitle) return;
-    console.log(spform, login, folderTitle);
+    var reqFields = ['Assignee', 'Folder Title'];
+    var vars = {};
+    var missingFields = [];
+    reqFields.forEach(function(key){
+        var val = spform.get(key);
+        if (!val) { missingFields.push(key); }
+        vars[key] = val;
+    });
+    if (missingFields.length > 0) {
+        alert("The following fields are required to provision a folder: " + missingFields.join(', '));
+        return;
+    }
 
-    var url  = _spPageContextInfo.webAbsoluteUrl + "/_api/Web/GetFolderByServerRelativeUrl('" + _spPageContextInfo.webServerRelativeUrl + "/" + listTitle + "/" + folderTitle + "')";
+    var folderTitle = vars['Folder Title'];
+    var assignee = vars['Assignee'];
+    var url = _spPageContextInfo.webAbsoluteUrl + "/_api/Web/GetFolderByServerRelativeUrl('" + _spPageContextInfo.webServerRelativeUrl + "/" + listTitle + "/" + folderTitle + "')";
     ensureResource(url, true).fail(function () {
         alert('Folder with that name already exists');
     }).then(function () {
+        if (!folderTitle) { return };
         return createFolder(listTitle + "/" + folderTitle);
     }).then(function (url) {
         spform.set('Folder Url', _spPageContextInfo.webAbsoluteUrl + '/' + listTitle + '/' + folderTitle);
         return getJsonAtUrl(url);
     }).then(function (listItem) {
-         setUniquePermissions(listItem.ID, login);
+        setUniquePermissions(listItem.ID, assignee);
+        btn.prop("disabled", true);
+        ['Assignee', 'Folder Title', 'Folder Url'].forEach(function (v) { spform.getElement(v).prop("readonly", true); })
     });
 };
 
@@ -178,13 +193,10 @@ var getSpForm = function () {
 window.onload = function () {
     spform = getSpForm();
     var el = spform.getElement('Folder Title');
-    createButton(el, buttonCaption, provisionSecuredFolder);
+    btn = createButton(el, buttonCaption, provisionSecuredFolder);
 };
 
-// ensure folder not exist
-    // use getJsonAtUrl: modify and add reject.. work on reject
-// disable stuff around
-// give folder access to Requestor -- auto
-// disable everything except for Status for the assignee
+// disable everything except for Status for the assignee EDIT ITEM form
 // refactor 3
 // add settings mode (rip from service catalog and refactor)
+// refactor 4
