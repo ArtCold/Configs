@@ -1,0 +1,73 @@
+<script src="/Style%20Library/sputility.min.js"></script><script>
+
+    function retrieveListItems() {
+		var CS_MAX_DIGITS = 6;
+		var CS_START_NUMBER = 1;
+		var CS_MONTH_CUTOFF = 8; 
+		var CS_YEAH_DIGITS = 2;
+		var CS_SEPARATION_CHAR = "-";
+		var CS_FIELDNAME = "Tracking ID";
+		var CS_INTERNAl_FIELDNAME = "Tracking_x0020_ID";
+		var CS_LISTTITLE = "NCATS Executive Officer Signature Library";
+		
+		var input = SPUtility.GetSPField(CS_FIELDNAME);
+		input.Textbox.readOnly = true;
+		input.Textbox.style.background = '#ccc';
+		
+        var cctx = new SP.ClientContext.get_current();
+        var list = cctx.get_web().get_lists().getByTitle(CS_LISTTITLE);
+        
+		var camlQuery = new SP.CamlQuery();
+        camlQuery.set_viewXml('<View><Query><OrderBy><FieldRef Name="' + CS_INTERNAl_FIELDNAME + '" Ascending="False" /></OrderBy></Query><RowLimit>1</RowLimit></View>');
+        var items = list.getItems(camlQuery);
+		cctx.load(items);
+		
+		var camlQuery2 = new SP.CamlQuery();
+        camlQuery2.set_viewXml('<View><Query><OrderBy><FieldRef Name="Created" Ascending="False" /></OrderBy></Query><RowLimit>1</RowLimit></View>');
+        var items2 = list.getItems(camlQuery2);
+		cctx.load(items2);
+		
+		cctx.executeQueryAsync(function () {
+			try {
+			var latestItem = items.get_item(0);
+			var currentItem = items2.get_item(0);
+
+			if (currentItem.get_fieldValues()[CS_INTERNAl_FIELDNAME]) return;
+			
+			var currentDate = currentItem.get_fieldValues().Created;
+			var currentYear = parseInt(currentDate.getFullYear().toString().substring(CS_YEAH_DIGITS));
+			
+			if (currentDate.getMonth() > CS_MONTH_CUTOFF)
+				currentYear++;
+			
+			var counter = CS_START_NUMBER;
+			debugger
+			if (latestItem.get_fieldValues().ID != currentItem.get_fieldValues().ID) {
+				var oldValue = latestItem.get_item(CS_INTERNAl_FIELDNAME);
+				if (oldValue) { 
+					var oldYear = parseInt(oldValue.split(CS_SEPARATION_CHAR)[0], 10);
+					if (oldYear == currentYear) {
+						counter = parseInt(oldValue.split(CS_SEPARATION_CHAR)[1], 10) + 1;
+					}
+				}
+			}
+
+			input.SetValue(currentYear.toString() + CS_SEPARATION_CHAR + pad(counter, CS_MAX_DIGITS));
+			}
+			catch(e) {
+				alert(e);
+			}
+		});        
+    }
+
+    // Create new id with fixed size : 
+    // exp : 00001, 00001
+    // num : is the number
+    // size : is the number size
+    function pad(num, size) {
+        var s = num.toString();
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+
+	ExecuteOrDelayUntilScriptLoaded(retrieveListItems, "sp.js"); </script>​​​​​​​​​
