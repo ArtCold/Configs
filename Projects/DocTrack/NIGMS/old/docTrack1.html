@@ -1,0 +1,295 @@
+﻿<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<script type="text/javascript">
+    function loadcss(filename, filetype) {
+        var ulr = _spPageContextInfo.webAbsoluteUrl + '/SiteAssets/' + filename;
+        var fileref = document.createElement("link");
+        fileref.setAttribute("rel", "stylesheet");
+        fileref.setAttribute("type", "text/css");
+        fileref.setAttribute("href", ulr);
+        if (typeof fileref != "undefined")
+            document.getElementsByTagName("head")[0].appendChild(fileref)
+    }
+
+	(function(d, script) {
+		script = d.createElement('script');
+		script.type = 'text/javascript';
+		script.async = true;
+		script.onload = function(){
+			// remote script has loaded
+		    angular.element(document).ready(function () {
+		        angular.bootstrap(document, ['app']);
+		    });
+
+		};  
+		script.src = _spPageContextInfo.webAbsoluteUrl + '/SiteAssets/Doctracker/doctrack.js';
+		d.getElementsByTagName('head')[0].appendChild(script);
+	}(document));
+
+	loadcss('Doctracker/style.css');
+</script>
+<script src="/style library/js/datepickr.js"></script>
+<script>
+    var pdfv = 'PdfFile.OpenDocuments';
+
+</script>
+<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+<div id="angular-app">
+    <div ng-form name="dtform" ng-controller="DocumentTracker" class="dt-maindiv" ng-cloak>
+
+        <!-- Access Denied Message-->
+        <fieldset ng-show="loaded.all &&
+                  !(
+                  ((session.isAdmin && (data.status != 'New' && data.status != 'Reverted')) || session.isCreator || session.isEditor || (session.isApprover && data.status == 'In Process' ))
+                  )
+                  ">
+            <p>You are not authorizied to view this item</p>
+        </fieldset>
+
+        <!-- Main Form -->
+        <fieldset ng-disabled="session.submitted || session.isViewMode"
+                  ng-show="
+                  !session.submitted && loaded.all &&
+                  ((session.isAdmin && (data.status != 'New' && data.status != 'Reverted')) || session.isCreator || session.isEditor || (session.isApprover && data.status == 'In Process' ))
+                ">
+            <a href="#" class="dt-help-link dt-icon" ng-show="!session.submitted && loaded.all"><img alt="Display help for the DCI Document Tracker application." title="Display help for the DCI Document Tracker application." src="/style library/DocTrack/question1.png" /></a>
+            <a href="#" ng-click="cancel()" class="dt-exit-link dt-icon"><img alt="Close the tracker item without saving any changes." title="Close the tracker item without saving any changes." src="/style library/DocTrack/x.png" /></a>
+
+            <a href="Main.aspx" class="dt-logo-img"><img alt="Home" src="/style library/DocTrack/logo.png" /></a>
+            <h2 class="dt-header">NCATS Document Tracker</h2>
+            <!-- Section 1 -->
+            <fieldset ng-disabled="!(data.status=='Draft' || data.status=='New' || data.status=='Reverted')" class="dt-group-wrapper">
+
+                <!-- Date and ID -->
+                <div class="dt-row">
+                    <div class="dt-column"><span class="dt-label">Date: </span><span>{{::data.initDate | date:'shortDate'}}</span></div>
+                    <div class="dt-column"><span class="dt-label">ID: </span><span>{{::data.id}}</span></div>
+                    <div class="dt-column" ng-show="data.status != 'Draft'"><span class="dt-label">Status: </span><span>{{data.status}}</span></div>
+                </div>
+
+                <!-- Document Type -->
+                <div class="dt-row">
+                    <div class="dt-column">
+                        <span class="dt-label">Document Type:<span class="dt-asteriks">*</span></span>
+                        <super-select ng-model="data.documentType" all-options="data.allDocumentTypes" source-list-name="documentTypeListName" />
+                    </div>
+                    <div class="dt-column">
+                        <span class="dt-label">Partner Agency:<span class="dt-asteriks">*</span></span>
+                        <select class="dt-select-dropdown" ng-model="data.partnerAgency" ng-options="item as item for item in lookups.allPartnerAgencies" required>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="dt-row">
+                    <p class="dt-label">Subject/Title:<span class="dt-asteriks">*</span></p>
+                    <input type="text" ng-model="data.title" size="40" required class="dt-w98" maxlength="255" />
+                    <p class="dt-counter">Characters left: {{255 - data.title.length}}</p>
+                </div>
+
+                <!-- Due Date -->
+                <div class="dt-row">
+                    <div class="dt-column dt-w25">
+                        <p class="dt-label">Due Date:<span class="dt-asteriks">*</span></p>
+                        <div>
+                            <mydatepickr ng-model="data.dueDate" clean-date="data.dueDateAsDate" class="max-width250" />
+                        </div>
+                        <div><span ng-show="data.dueDateAsDate < session.today" class="dt-warning">Due Date cannot be before today</span></div>
+                    </div>
+                </div>
+            </fieldset>
+
+            
+            <fieldset ng-disabled="data.status=='Cancelled' || data.status == 'Recalled' || data.status=='Closed'" class="dt-group-wrapper">
+
+                <!-- For Sign -->
+                <div class="dt-row-no-margin">
+                    <div class="dt-column">
+                        <p class="dt-label">Documents requiring Signature:<span class="dt-asteriks">*</span>
+                            <fileread callback="uploadAttachment" class="dt-uploader" category="signature" 
+                                label="Add Document" />
+                        </p>
+                        <ul>
+                            <li ng-repeat="att in filteredEntries = (data.attachments | filter:{ category: 'signature'})">
+                                <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.folderTempName}}/{{att.filename}}" ng-show="!att.isPdf"
+                                   onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'SharePoint.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                                    {{att.title}}
+                                </a>
+                                <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.folderTempName}}/{{att.filename}}" ng-show="att.isPdf"
+                                   onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'PdfFile.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                                    {{att.title}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Validate number of documents -->
+                    <input style="display:none;" name="requestDocumentLength" notzero ng-model="(data.attachments | filter:{ category: 'signature'}).length"/>
+                    <!-- End:Validation -->
+
+                    <!-- For Read -->
+                    <div class="dt-column">
+                        <p class="dt-label">Not for Signature:<fileread callback="uploadAttachment" class="dt-uploader" category="information" label="Add Document" /></p>
+                        <ul>
+                            <li ng-repeat="att in filteredEntries = (data.attachments | filter:{ category: 'information'})">
+                                <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.folderTempName}}/{{att.filename}}" ng-show="!att.isPdf"
+                                   onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'SharePoint.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                                    {{att.title}}
+                                </a>
+                                <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.folderTempName}}/{{att.filename}}" ng-show="att.isPdf"
+                                   onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'PdfFile.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                                    {{att.title}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Section 3 -->
+            <fieldset ng-disabled="!(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')" class="dt-group-wrapper">
+
+                <!-- Creator comments -->
+                <div class="dt-row">
+                    <div class="dt-column dt-w25"><p class="dt-label">Initiator: </p><span>{{::data.creator.name}}</span></div>
+                    <div class="dt-column">
+                        <p class="dt-label">Initiator Comment(s):</p>
+                        <textarea class="dt-w98" cols="80" rows="3" maxlength="1000" ng-model="data.creatorComment" ng-disabled="!(data.status=='Draft' || data.status == 'New' && session.isCreator || data.status=='Reverted' && session.isCreator )"></textarea>
+                        <p class="dt-counter">Characters left: {{1000 - data.creatorComment.length}}</p>
+                    </div>
+                </div>
+
+                <!-- Editor comments -->
+                <div class="dt-row" ng-show="((data.status=='New' || data.status=='Reverted' ) && session.isEditor) || data.editor.name">
+                    <div class="dt-column dt-w25"><p class="dt-label">Editor: </p><span>{{::data.editor.name}}</span></div>
+                    <div class="dt-column">
+                        <p class="dt-label">Editor Comment(s):</p>
+                        <textarea class="dt-w98" cols="80" rows="3" maxlength="1000" ng-model="data.editorComment"
+                                  ng-disabled="!session.isEditor"></textarea>
+                        <p class="dt-counter">Characters left: {{1000 - data.editorComment.length}}</p>
+                    </div>
+                </div>
+
+                <!-- Approvers -->
+                <div class="dt-row" ng-show="data.status=='Draft' || data.status == 'New' || data.status=='Reverted'">
+                    <p class="dt-label">Routing Slip:</p>
+                    <my-double-box ng-model="data.approvers" option-source="session.allApprovers" />
+                </div>
+
+                <!-- Buttons -->
+                <div class="dt-row" ng-show="!session.isViewMode && (data.status=='Draft' || data.status == 'New' || data.status=='Reverted')" style="position: relative;">
+                    <input class="dt-3d-button" type="button" ng-click="save()" value="Save" title="Save the tracker item without initiating or closing it." />
+                    <input class="dt-3d-button" type="button" ng-click="cancel()" value="Cancel" title="Close the tracker item without saving any changes." />
+                    <input class="dt-3d-button" type="button" ng-click="initiate()" value="Initiate"
+                           ng-attr-title="{{
+                       dtform.$invalid ||
+                        !data.attachments ||
+                        !data.dueDate ||
+                        data.dueDateAsDate < session.today ||
+                        !data.approvers ||
+                        data.approvers.length == 0
+                       ? 'Please complete all required fields' : 'Save the tracker item and initiate the request, forwarding it to the first recipient.' }}"
+                           title="Please complete all required fields"
+                           ng-disabled="
+                        dtform.$invalid ||
+                        !data.attachments ||
+                        !data.dueDate ||
+                        data.dueDateAsDate < session.today ||
+                        !data.approvers ||
+                        data.approvers.length == 0
+                    " />
+                    <input class="dt-3d-button" type="button" ng-show="(data.status=='New' || data.status=='Reverted') && (session.isAdmin || session.isCreator || session.isEditor)" ng-click="remove()" value="Remove" title="The Tracker Item has not been distributed to anyone on the Routing Slip. Remove this Tracker Item from the system." style="position: absolute; right: 20px;" />
+                </div>
+
+            </fieldset>
+
+            <!-- Comments -->
+            <fieldset class="dt-group-wrapper">
+
+                <!-- Slip -->
+                <div class="dt-row" ng-show="data.status != 'Draft' && data.status != 'New'">
+                    <p class="dt-label">Routing Slip:</p>
+                    <table id="dt-routing-slip-table">
+                        <thead class="dt-rs-row">
+                            <tr>
+                                <th class="dt-rs-column dt-rs-column-receiver">Receiver</th>
+                                <th class="dt-rs-column dt-rs-column-date">Date Routed</th>
+                                <th class="dt-rs-column dt-rs-column-comment">Comment</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Comment Table -->
+                        <tbody>
+                            <tr class="dt-rs-row" ng-repeat="item in data.comments">
+                                <!--<td class="dt-rs-column">{{!item.comment && session.signer.indexOf(session.currentUser.name) > -1 && session.pocOf == item.name ? session.signer : item.name}}</td>-->
+								<td class="dt-rs-column">{{item.name}}</td>
+                                <td class="dt-rs-column">{{item.date}}</td>
+                                <td class="dt-rs-column">
+                                    <div>{{item.comment}}</div>
+                                </td>
+                            </tr>
+                            <tr class="dt-rs-row" ng-show="data.status == 'In Process' && (session.currentUser.name == data.currentEmailReceiver.name || session.currentUser.name == data.currentApprover.name)">
+                                <td class="dt-rs-column">{{session.signer}}</td>
+                                <td class="dt-rs-column"></td>
+                                <td class="dt-rs-column">
+                                    <div>
+                                        <table class="dt-table-clear">
+                                            <tr>
+                                                <td><textarea class="dt-w98" maxlength="1000" ng-model="data.newComment" cols="80" rows="3"></textarea></td>
+                                                <td><input type="button" ng-click="approve()" value="Approve" title="Acknowledge your approval of this tracked item and move it forward to the next recipient." /></td>
+                                                <td><input type="button" ng-click="revert()" value="Revert" title="Acknowledge your wish for changes to this tracked item and return it to the initiator so they can make the appropriate changes and re-initiate the item." /></td>
+                                                <td><input type="button" ng-click="disapprove()" value="Disapprove" title="Acknowledge your disapproval of this tracked item and return it to the initiator." /></td>
+                                            </tr>
+                                        </table>
+                                        <p class="dt-counter">Characters left: {{1000 - data.newComment.length}}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="dt-rs-row" ng-repeat="item in data.futureComments">
+                                <td class="dt-rs-column">{{item.name}}</td>
+                                <td class="dt-rs-column"></td>
+                                <td class="dt-rs-column"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recall -->
+                <div class="dt-row" ng-show="(session.isAdmin || session.isEditor || session.isCreator ) && data.status == 'In Process' || data.recallReason && (data.status == 'Cancelled' || data.status == 'Recalled') ">
+                    <p class="dt-label">Recall Reason:</p>
+                    <table class="dt-table-clear dt-w50">
+                        <tr>
+                            <td><textarea ng-model="data.recallReason" maxlength="1000" cols="60" rows="3" ng-disabled="data.status != 'In Process'"></textarea></td>
+                            <td><input type="button" ng-show="data.status == 'In Process'" ng-disabled="!data.recallReason" ng-click="recall()" value="Recall" title="Cancel the tracker item" /></td>
+                        </tr>
+                    </table>
+                    <p class="dt-counter" ng-show="data.status == 'In Process'">Characters left: {{1000 - data.recallReason.length}}</p>
+                    <p class="dt-label" ng-show="data.recallReason && (data.status == 'Cancelled' || data.status == 'Recalled')">Recalled by: {{data.recalledBy.name}}</p>
+                </div>
+
+            </fieldset>
+
+            <!-- Close Out -->
+            <fieldset class="dt-group-wrapper" ng-show="data.status == 'Complete' || data.status == 'Closed'" ng-disabled="data.status == 'Closed' || (!session.isCreator && !session.isEditor)">
+                <div class="dt-row-no-margin">
+                    <p>
+                        <p class="dt-label" ng-show="data.status == 'Complete'">Close Out:<span class="dt-asteriks">*</span> <input type="checkbox" ng-model="data.closedOut" />&nbsp;&nbsp;</p>
+                        <span>Close Out By: </span><span ng-show="data.closedOut || data.status == 'Closed'">{{::session.currentUser.name}}</span><br />
+                        <span ng-show="data.status == 'Closed'">Close Out Date: {{::data.closedOutDate | date:'shortDate'}}</span>
+                    </p>
+                    <span ng-show="data.status == 'Complete'">
+                        <input type="button" ng-click="closeOut()" value="Save" ng-disabled="!data.closedOut" title="Save" />
+                        <input type="button" ng-click="cancel()" value="Cancel" title="Close the tracker item without saving any changes" />
+                    </span>
+                </div>
+            </fieldset>
+            <fieldset class="dt-group-wrapper" ng-show="data.status == 'Closed'">
+                <div class="dt-row-no-margin">
+                    <input ng-show="data.status == 'Closed'" class="dt-3d-button" type="button" value="Print" ng-click="print()" />        
+                </div>
+            </fieldset>
+        </fieldset>
+
+        <!-- Modal Dialog-->
+        <modal-dialog show='modalShown' action="goBackToList" message="modalMessage" />
+    </div>
+</div>

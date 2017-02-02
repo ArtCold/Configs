@@ -1,0 +1,1367 @@
+﻿<script src="/style library/js/angular.min.js"></script>
+<script type="text/javascript" src="/style library/js/datepickr.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+<link href="/style library/DocTrack/style.css" rel='stylesheet' type='text/css'>
+
+<div id="angular-app" ng-app="formExample">
+    <div ng-form name="dtform" ng-controller="DocumentTracker" class="dt-maindiv" ng-cloak>
+
+        <!-- Access Denied Message-->
+        <fieldset ng-show="loaded.all &&
+                  !(
+                  ((session.isAdmin && (data.status != 'New' && data.status != 'Reverted')) || session.isCreator || session.isEditor || (session.isApprover && data.status == 'In Process' ))
+                  )
+                  ">
+            <p>You are not authorizied to view this item</p>
+        </fieldset>
+
+        <!-- Main Form -->
+        <fieldset ng-disabled="session.submitted || session.isViewMode"
+                  ng-show="!session.submitted && loaded.all && ((session.isAdmin && (data.status != 'New' && data.status != 'Reverted')) || session.isCreator || session.isEditor || (session.isApprover && data.status == 'In Process' ))">
+            <a href="#" ng-click="cancel()" class="dt-exit-link dt-icon"><img alt="Close the tracker item without saving any changes." title="Close the tracker item without saving any changes." src="/style library/DocTrack/x.png" /></a>
+
+            <a href="https://translator.ncats.nih.gov/ASBDocumentTracker/SitePages/Home.aspx" class="dt-logo-img"><img alt="Home" src="/style library/DocTrack/logo.png" /></a>
+            <h2 class="dt-header">ASB Document Tracker</h2>
+            <!-- Section 1 -->
+            <fieldset ng-disabled="!(data.status=='Draft' || data.status=='New' || data.status=='Reverted')" class="dt-group-wrapper">
+
+                <!-- Date and ID -->
+                <div class="dt-row">
+                    <div class="dt-column"><span class="dt-label">Date: </span><span>{{::data.initDate | date:'shortDate'}}</span></div>
+                    <div class="dt-column"><span class="dt-label">ID: </span><span>{{::data.id}}</span></div>
+                    <div class="dt-column" ng-show="data.status != 'Draft'"><span class="dt-label">Status: </span><span>{{data.status}}</span></div>
+                </div>
+
+                <!-- Document Type -->
+                <div class="dt-row">
+                    <span class="dt-label">Document Type:<span class="dt-asteriks">*</span></span>
+                    <super-select ng-model="data.documentType" all-options="data.allDocumentTypes" source-list-name="documentTypeListName" />
+                </div>
+
+                <!-- Title -->
+                <div class="dt-row">
+                    <p class="dt-label">Subject/Title:<span class="dt-asteriks">*</span></p>
+                    <input type="text" ng-model="data.title" size="40" required class="dt-w98" maxlength="255" />
+                    <p class="dt-counter">Characters left: {{255 - data.title.length}}</p>
+                </div>
+
+                <!-- Due Date, Priority and Sensetive -->
+                <div class="dt-row">
+                    <div class="dt-column dt-w25">
+                        <p class="dt-label">Priority:<span class="dt-asteriks">*</span></p>
+                        <input type="radio" ng-model="data.priority" id="dt-prior1" value="High" required /><label for="dt-prior1">High</label><br />
+                        <input type="radio" ng-model="data.priority" id="dt-prior2" value="Standard" required /><label for="dt-prior2">Standard</label>
+                    </div>
+                    <div class="dt-column dt-w25">
+                        <p class="dt-label">Due Date:<span class="dt-asteriks">*</span></p>
+                        <div>
+                            <datepickr ng-model="data.dueDate" clean-date="data.dueDateAsDate" class="max-width250" />
+                        </div>
+                        <div><span ng-show="data.dueDateAsDate < session.today" class="dt-warning">Due Date cannot be before today</span></div>
+                    </div>
+                </div>
+
+            </fieldset>
+
+            <!-- Distribution -->
+            <fieldset ng-disabled="data.status=='Cancelled' || data.status == 'Recalled' || data.status=='Closed'" class="dt-group-wrapper">
+                <div class="dt-row">
+                    <div class="dt-column">
+                        <input type="checkbox" ng-model="data.sensetive" ng-true-value="'No'" ng-false-value="'Yes'" ng-disabled="data.distribution == 'Attached' || !(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')">
+                        <label class="dt-label">
+                            This document DOES NOT contain sensitive information or PII. Documents that contain sensitive information can be tracked using this tool, but should be distributed in hard copy or via secure email - <span>
+                                <a target="_blank" href="https://oma.nih.gov/dms/programs/privacy/Shared Documents/FAQs/NIH Privacy FAQs June 2014.doc">What is PII?</a>
+                            </span>
+                            <span><a target="_blank" href="https://www.youtube.com/watch?v=3hHnT1szO7c&feature=youtu.be">Protecting Sensitive Information</a></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="dt-row-no-margin">
+                    <p class="dt-label">Document Distribution Method:<span class="dt-asteriks">*</span></p>
+                    <input type="radio" required ng-model="data.distribution" id="dt-distr1" value="Attached" ng-disabled="data.sensetive!='No' || !(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')" /><label for="dt-distr1">Attached</label>
+                    <input type="file" fileread="data.attachment" title="Choose file to upload" class="dt-uploader" ng-disabled="!(data.distribution && data.distribution == 'Attached') || !(data.status == 'Draft' || data.status == 'New'|| data.status=='Reverted')" />
+                    <span ng-show="data.distribution=='Attached'">
+                        <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.attachmentTitle}}" ng-show="!data.attachmentIsPdf"
+                           onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'SharePoint.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                            {{::data.attachmentTitle.split('/')[1]}}
+                        </a>
+                        <a href="{{session.webUrl}}/{{session.settings.documentLibraryName}}/{{data.attachmentTitle}}" ng-show="data.attachmentIsPdf"
+                           onclick="return DispEx(this, event, 'TRUE', 'FALSE', 'FALSE', '', '0', 'PdfFile.OpenDocuments', '', '', '', '1434', '0', '0', '0x7fffffffffffffff', '', '')">
+                            {{::data.attachmentTitle.split('/')[1]}}
+                        </a>
+                    </span>
+                    <span class="dt-warning" ng-show="data.attachmentTitle && data.attachment">Warning! The old attachment will be replaced with the new one.<br /></span>
+                    <input type="radio" required ng-model="data.distribution" id="dt-distr2" value="Email" ng-disabled="!(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')" /><label for="dt-distr2">Email</label>
+                    <input type="radio" required ng-model="data.distribution" id="dt-distr3" value="Hardcopy" ng-disabled="!(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')" /><label for="dt-distr3">Hardcopy</label>
+                </div>
+            </fieldset>
+
+            <!-- Section 3 -->
+            <fieldset ng-disabled="!(data.status=='Draft' || data.status=='New'|| data.status=='Reverted')" class="dt-group-wrapper">
+
+                <!-- Creator comments -->
+                <div class="dt-row">
+                    <div class="dt-column dt-w25"><p class="dt-label">Initiator: </p><span>{{::data.creator.name}}</span></div>
+                    <div class="dt-column">
+                        <p class="dt-label">Initiator Comment(s):</p>
+                        <textarea class="dt-w98" cols="80" rows="3" maxlength="1000" ng-model="data.creatorComment" ng-disabled="!(data.status=='Draft' || data.status == 'New' && session.isCreator || data.status=='Reverted' && session.isCreator )"></textarea>
+                        <p class="dt-counter">Characters left: {{1000 - data.creatorComment.length}}</p>
+                    </div>
+                </div>
+
+                <!-- Editor comments -->
+                <div class="dt-row" ng-show="((data.status=='New' || data.status=='Reverted' ) && session.isEditor) || data.editor.name">
+                    <div class="dt-column dt-w25"><p class="dt-label">Editor: </p><span>{{::data.editor.name}}</span></div>
+                    <div class="dt-column">
+                        <p class="dt-label">Editor Comment(s):</p>
+                        <textarea class="dt-w98" cols="80" rows="3" maxlength="1000" ng-model="data.editorComment"
+                                  ng-disabled="!session.isEditor"></textarea>
+                        <p class="dt-counter">Characters left: {{1000 - data.editorComment.length}}</p>
+                    </div>
+                </div>
+
+                <!-- Parallel or Sequential -->
+                <div class="dt-row">
+                    <div class="dt-column dt-w25">
+                        <p class="dt-label">Approving Process Type:<span class="dt-asteriks">*</span></p>
+                        <input type="radio" ng-model="data.isParallel" id="dt-parallel1" value="No" required /><label for="dt-parallel1">Approval Workflow</label><br />
+                        <input type="radio" ng-model="data.isParallel" id="dt-parallel2" value="Yes" required /><label for="dt-parallel2">Solicit Feedback</label>
+                        <p>
+                    </div>
+                    <div class="dt-column dt-w25">
+                        <p class="dt-label">Will this document require Executive Officer Signature:<span class="dt-asteriks">*</span></p>
+                        <input type="radio" ng-model="data.notifyAo" id="dt-pingao1" value="Yes" required /><label for="dt-parallel1">Yes</label><br />
+                        <input type="radio" ng-model="data.notifyAo" id="dt-pingao2" value="No" required /><label for="dt-parallel2">No</label>
+                        <p>
+                    </div>
+                </div>
+
+                <!-- Approvers -->
+                <div class="dt-row" ng-show="data.status=='Draft' || data.status == 'New' || data.status=='Reverted'">
+                    <p class="dt-label">Routing Slip:</p>
+                    <my-double-box ng-model="data.approvers" option-source="session.allApprovers" />
+                </div>
+
+                <!-- Buttons -->
+                <div class="dt-row" ng-show="!session.isViewMode && (data.status=='Draft' || data.status == 'New' || data.status=='Reverted')" style="position: relative;">
+                    <input class="dt-3d-button" type="button" ng-click="save()" value="Save" title="Save the tracker item without initiating or closing it." />
+                    <input class="dt-3d-button" type="button" ng-click="cancel()" value="Cancel" title="Close the tracker item without saving any changes." />
+                    <input class="dt-3d-button" type="button" ng-click="initiate()" value="Initiate"
+                           ng-attr-title="{{
+                       dtform.$invalid ||
+                        data.distribution == 'Attached' && !(data.attachment || data.attachmentTitle) ||
+                        !data.dueDate ||
+                        data.dueDateAsDate < session.today ||
+                        !data.approvers ||
+                        data.approvers.length == 0
+                       ? 'Please complete all required fields' : 'Save the tracker item and initiate the request, forwarding it to the first recipient.' }}"
+                           title="Please complete all required fields"
+                           ng-disabled="
+                        dtform.$invalid ||
+                        data.distribution == 'Attached' && !(data.attachment || data.attachmentTitle) ||
+                        !data.dueDate ||
+                        data.dueDateAsDate < session.today ||
+                        !data.approvers ||
+                        data.approvers.length == 0
+                    " />
+                    <input class="dt-3d-button" type="button" ng-show="(data.status=='New' || data.status=='Reverted') && (session.isAdmin || session.isCreator || session.isEditor)" ng-click="remove()" value="Remove" title="The Tracker Item has not been distributed to anyone on the Routing Slip. Remove this Tracker Item from the system." style="position: absolute; right: 20px;" />
+                </div>
+
+            </fieldset>
+
+            <!-- Comments -->
+            <fieldset class="dt-group-wrapper">
+
+                <!-- Slip -->
+                <div class="dt-row" ng-show="data.status != 'Draft' && data.status != 'New'">
+                    <p class="dt-label">Routing Slip:</p>
+                    <table id="dt-routing-slip-table">
+                        <thead class="dt-rs-row">
+                            <tr>
+                                <th class="dt-rs-column dt-rs-column-receiver">Receiver</th>
+                                <th class="dt-rs-column dt-rs-column-date">Date Routed</th>
+                                <th class="dt-rs-column dt-rs-column-comment">Comment</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Sequential -->
+                        <tbody ng-show="data.isParallel != 'Yes'">
+                            <tr class="dt-rs-row" ng-repeat="item in data.commentTable">
+                                <td class="dt-rs-column">{{item.name}}</td>
+                                <td class="dt-rs-column">{{item.date}}</td>
+                                <td class="dt-rs-column">
+                                    <div ng-show="item.comment">{{item.comment}}</div>
+                                    <div ng-show="!item.comment && session.isApprover && data.status == 'In Process' && (session.signer.indexOf(item.name) > -1 || session.currentUser.name == item.name)">
+                                        <table class="dt-table-clear">
+                                            <tr>
+                                                <td><textarea class="dt-w98" maxlength="1000" ng-model="data.newComment" cols="80" rows="3"></textarea></td>
+                                                <td><input type="button" ng-click="approve()" value="Approve" title="Acknowledge your approval of this tracked item and move it forward to the next recipient." /></td>
+                                                <td><input type="button" ng-click="disapprove()" value="Disapprove" title="Acknowledge your disapproval of this tracked item and return it to the initiator." /></td>
+                                                <td><input type="button" ng-click="revert()" value="Revert" title="Acknowledge your wish for changes to this tracked item and return it to the initiator so they can make the appropriate changes and re-initiate the item." /></td>
+                                            </tr>
+                                        </table>
+                                        <p class="dt-counter">Characters left: {{1000 - data.newComment.length}}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <!-- Parallel -->
+                        <tbody ng-show="data.isParallel == 'Yes'">
+                            <tr class="dt-rs-row" ng-repeat="item in data.commentTable">
+                                <td class="dt-rs-column">{{session.pocOf == item.name ? session.signer : item.name}}</td>
+                                <td class="dt-rs-column">{{item.date}}</td>
+                                <td class="dt-rs-column">
+                                    <p>{{item.comment}}</p>
+                                    <div ng-show="!item.comment && data.status == 'In Process' && session.signer.indexOf(item.name) > -1">
+                                        <table class="dt-table-clear">
+                                            <tr>
+                                                <td><textarea class="dt-w98" maxlength="1000" ng-model="data.newComment" cols="80" rows="3"></textarea></td>
+                                                <td><input type="button" ng-click="approve()" value="Approve" title="Approve item" /></td>
+                                                <td><input type="button" ng-click="disapprove()" value="Disapprove" title="Acknowledge your disapproval of this tracked item and return it to the initiator." /></td>
+                                            </tr>
+                                        </table>
+                                        <p class="dt-counter">Characters left: {{1000 - data.newComment.length}}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recall -->
+                <div class="dt-row" ng-show="(session.isAdmin || session.isEditor || session.isCreator ) && data.status == 'In Process' || data.recallReason && (data.status == 'Cancelled' || data.status == 'Recalled') ">
+                    <p class="dt-label">Recall Reason:</p>
+                    <table class="dt-table-clear dt-w50">
+                        <tr>
+                            <td><textarea ng-model="data.recallReason" maxlength="1000" cols="60" rows="3" ng-disabled="data.status != 'In Process'"></textarea></td>
+                            <td><input type="button" ng-show="data.status == 'In Process'" ng-disabled="!data.recallReason" ng-click="recall()" value="Recall" title="Cancel the tracker item" /></td>
+                        </tr>
+                    </table>
+                    <p class="dt-counter" ng-show="data.status == 'In Process'">Characters left: {{1000 - data.recallReason.length}}</p>
+                    <p class="dt-label" ng-show="data.recallReason && (data.status == 'Cancelled' || data.status == 'Recalled')">Recalled by: {{data.recalledBy.name}}</p>
+                </div>
+
+            </fieldset>
+
+            <!-- Close Out -->
+            <fieldset class="dt-group-wrapper" ng-show="data.status == 'Complete' || data.status == 'Closed'" ng-disabled="data.status == 'Closed' || (!session.isCreator && !session.isEditor)">
+                <div class="dt-row-no-margin">
+                    <p>
+                    <p class="dt-label" ng-show="data.status == 'Complete'">Close Out:<span class="dt-asteriks">*</span> <input type="checkbox" ng-model="data.closedOut" />&nbsp;&nbsp;</p>
+                    <span>Close Out By: </span><span ng-show="data.closedOut || data.status == 'Closed'">{{::session.currentUser.name}}</span><br />
+                    <span ng-show="data.status == 'Closed'">Close Out Date: {{::data.closedOutDate | date:'shortDate'}}</span>
+                    </p>
+                    <span ng-show="data.status == 'Complete'">
+                        <p><i><b>By closing out this item you are confirming that the document being tracked has been filed appropriately.</b></i></p>
+                        <p><i><b>When Save is pressed, the attachment to this tracker item, if any, will automatically be deleted.</b></i></p>
+                        <input type="button" ng-click="closeOut()" value="Save" ng-disabled="!data.closedOut" title="By closing out this item you are confirming that the document being tracked has been filed appropriately. When Save is pressed, the attachment to this tracker item, if any, will automatically be deleted." />
+                        <input type="button" ng-click="cancel()" value="Cancel" title="Close the tracker item without saving any changes" />
+                    </span>
+                </div>
+            </fieldset>
+        </fieldset>
+
+        <!-- Modal Dialog-->
+        <modal-dialog show='modalShown' action="goBackToList" message="modalMessage" />
+    </div>
+</div>
+
+<script>
+    var app = angular.module('formExample', []);
+
+    // FACTORIES
+    app.factory('Settings', function () {
+        return {
+            adminGroupid: 109,
+            approversListName: "Document Tracker Approvers",
+            documentTypeListName: "Document Tracker Document Types",
+            documentLibraryName: "Document Tracker Attachments",
+            documentFilterQuery: "Forms/AllItems.aspx?FilterField1=Title&FilterValue1="
+        }
+    });
+    app.factory('Session', function (UtilFactory) {
+        var currentUser = null;
+        var listTitle = null;
+        var itemId = null;
+        var isEditMode = window.location.pathname.indexOf('EditForm.aspx') > -1 || window.location.pathname.indexOf('DispForm.aspx') > -1;
+        var isSp2013 = _spPageContextInfo.webUIVersion == 15;
+        var isViewMode = window.location.pathname.indexOf('DispForm.aspx') > -1;
+        var getCurrentUser = function () {
+            return currentUser;
+        };
+        var getListTitle = function () {
+            if (!listTitle) {
+                var ar = window.location.pathname.split('/');
+                listTitle = ar[ar.indexOf("Lists") + 1];
+                var find = "%20";
+                var regex = new RegExp(find, "g");
+                listTitle = listTitle.replace(regex, " ");
+            }
+            return listTitle;
+        };
+        var getItemId = function () {
+            if (!itemId)
+                itemId = UtilFactory.getUrlParameterByName('ID');
+            return itemId;
+        };
+        var getSiteUrl = function () {
+            return getOriginUrl() + _spPageContextInfo.webServerRelativeUrl;
+        };
+        var getOriginUrl = function () {
+            if (!window.location.origin) {
+                window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+            }
+            return window.location.origin;
+        };
+        var setItemId = function (id) {
+            itemId = id;
+        };
+        var setCurrentUser = function (user) {
+            currentUser = user;
+        };
+        return {
+            isEditMode: isEditMode,
+            isSp2013: isSp2013,
+            isViewMode: isViewMode,
+            getCurrentUser: getCurrentUser,
+            getListTitle: getListTitle,
+            getItemId: getItemId,
+            getOriginUrl: getOriginUrl,
+            getSiteUrl: getSiteUrl,
+            setItemId: setItemId,
+            setCurrentUser: setCurrentUser
+        };
+    });
+    app.factory('ListDataFactory', function ($q, Session, UtilFactory) {
+        var fields = {
+            'approver': { type: 'Person', name: 'Approver' },
+            'approvers': { type: 'MultiPerson', name: 'Approvers' },
+            'attachmentTitle': { type: 'Text', name: 'AttachmentTitle', allowNull: true },
+            'closedOutBy': { type: 'Person', name: 'ClosedOutBy' },
+            'closedOutDate': { type: 'Date', name: 'ClosedOutDate' },
+            'comments': { type: 'JsonArray', name: 'Comments' },
+            'creator': { type: 'Person', name: 'Author', readOnly: true },
+            'creatorComment': { type: 'Text', name: 'CreatorComment' },
+            'currentApprover': { type: 'Person', name: 'CurrentApprover' },
+            'currentAssignee': { type: 'Text', name: 'Current Assignee', allowNull: true },
+            'currentEmailReceiver': { type: 'Person', name: 'CurrentEmailReceiver' },
+            'distribution': { type: 'Text', name: 'Document Distribution' },
+            'documentType': { type: 'Text', name: 'Document Type' },
+            'dueDate': { type: 'Date', name: 'Due Date' },
+            'editor': { type: 'Person', name: 'Editor0' },
+            'editorComment': { type: 'Text', name: 'EditorComment' },
+            'id': { type: 'Number', name: 'ID', readOnly: true },
+            'initDate': { type: 'Date', name: 'Request Date' },
+            'isParallel': { type: 'Text', name: 'isParallel' },
+            'isPoc': { type: 'Number', name: 'IsPoc', allowNull: true },
+            'lastSigner': { type: 'Text', name: 'LastSigner' },
+            'nextAssignee': { type: 'Text', name: 'Next Assignee', allowNull: true },
+            'poc': { type: 'Person', name: 'POC' },
+            'previousAssignee': { type: 'Text', name: 'Previous Assignee', allowNull: true },
+            'priority': { type: 'Text', name: 'High Priority?' },
+            'recalledBy': { type: 'Person', name: 'RecalledBy' },
+            'recallReason': { type: 'Text', name: 'RecallReason' },
+            'remainingApprovers': { type: 'MultiPerson', name: 'Remaining Approvers' },
+            'sensetive': { type: 'Text', name: 'isSensetive' },
+            'status': { type: 'Text', name: 'Status' },
+            'title': { type: 'Text', name: 'Title' },
+            'wfCounter': { type: 'Number', name: 'WFCounter' },
+            'notifyAo': { type: 'Text', name: 'NotifyAO' }
+        };
+        var parseDataToItem = function (data, item) {
+            for (var key in fields) {
+                var field = fields[key];
+                if (field.readOnly) continue;
+                if (field.defaultValue && !data.hasOwnProperty(key)) data[key] = field.defaultValue;
+                if (!data.hasOwnProperty(key)) continue;
+                var value = data[key];
+                var afterValue;
+                switch (field.type) {
+                    case 'MultiLookup':
+                        if (!value) continue;
+                        var lookupsIds = typeof value == "string" ? value.split(',') : value;
+                        var lookups = [];
+                        for (var ii in lookupsIds) {
+                            var lookupValue = new SP.FieldLookupValue();
+                            lookupValue.set_lookupId(lookupsIds[ii]);
+                            lookups.push(lookupValue);
+                        }
+                        afterValue = lookups;
+                        break;
+                    case 'Boolean':
+                        afterValue = value == '1'? 1 : 0;
+                        break;
+                    case 'JsonArray':
+                        if (!value) continue;
+                        afterValue = angular.toJson(value);
+                        break;
+                    case 'Person':
+                        if (value) {
+                            afterValue = SP.FieldUserValue.fromUser(value.title);
+                            afterValue.set_lookupId(value.id);
+                        } else {
+                            afterValue = null;
+                        }
+                        break;
+                    case 'Date':
+                        if (!value) continue
+                        afterValue = new Date(Date.parse(value));
+                        break;
+                    case 'MultiPerson':
+                        if (!value) continue
+                        var lookups = [];
+                        var values = angular.fromJson(value);
+                        for (var i = 0; i < values.length; i++) {
+                            var lookupValue = SP.FieldUserValue.fromUser(values[i].title);
+                            lookupValue.set_lookupId(values[i].id);
+                            lookups.push(lookupValue);
+                        }
+                        afterValue = lookups;
+                        break;
+                    default:
+                        if (!value && !field.allowNull) continue
+                        afterValue = value;
+                }
+                var fieldName = field.name.replace(/ /g, '_x0020_');
+                var fieldName = fieldName.replace('?', '_x003f_');
+                item.set_item(fieldName, afterValue);
+            }
+            item.update();
+        }
+        var parseField = function (obj, field) {
+            var fieldName = field.name.replace(/ /g, '_x0020_');
+            var fieldName = fieldName.replace('?', '_x003f_');
+
+            var val = obj[fieldName];
+
+            switch (field.type) {
+                case 'MultiLookup':
+                    var s = [];
+                    for (var i = 0; i < val.length; i++) {
+                        var lv = val[i];
+                        s.push(lv.get_lookupId());
+                    }
+                    val = s;
+                    break;
+
+                case 'JsonArray':
+                    if (val == null) {
+                        val = [];
+                    } else {
+                        val = JSON.parse(val);
+                    }
+                    break;
+
+                case 'Person':
+                    if (!val) return null;
+                    var name = val.get_lookupValue();
+                    var id = val.get_lookupId();
+                    val = { name: UtilFactory.formatName(name), id: id, title: name };
+                    break;
+
+                case 'MultiPerson':
+                    if (!val) return null;
+                    var s = [];
+                    for (var i = 0; i < val.length; i++) {
+                        var lv = val[i];
+                        var name = lv.get_lookupValue();
+                        var id = lv.get_lookupId();
+                        s.push({ name: UtilFactory.formatName(name), id: id, title: name });
+                    }
+                    val = s;
+                    break;
+            }
+
+            return val;
+        };
+        var parseItemToData = function (item, attFiles) {
+            var obj = item.get_fieldValues();
+            var data = {};
+            for (var key in fields) {
+                var field = fields[key];
+                var newVal = parseField(obj, field);
+                if (newVal != null) data[key] = newVal;
+            }
+            return data;
+        };
+        var getAllItems = function (listTitle, loadQuery) {
+            var deferred = $q.defer();
+            SP.SOD.executeOrDelayUntilScriptLoaded(function () {
+                var ctx = SP.ClientContext.get_current();
+                var list = ctx.get_web().get_lists().getByTitle(listTitle);
+                var query = SP.CamlQuery.createAllItemsQuery();
+                var items = list.getItems(query);
+                if (loadQuery) {
+                    ctx.load(items, loadQuery);
+                } else {
+                    ctx.load(items);
+                }
+                ctx.executeQueryAsync(
+                    function () {
+                        var arr = [];
+                        for (var i = 0; i < items.get_count() ; i++) {
+                            var item = items.getItemAtIndex(i);
+                            arr.push(item.get_fieldValues());
+                        }
+                        deferred.resolve(arr);
+                    },
+                    function (e) {
+                        console.log('Error: ' + e);
+                    }
+                );
+            }, 'SP.js');
+            return deferred.promise;
+        };
+        var createFolder = function (listTitle, folderName) {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var list = ctx.get_web().get_lists().getByTitle(listTitle);
+            var rootFolder = list.get_rootFolder();
+            var curFolder = rootFolder.get_folders().add(folderName);
+            ctx.load(curFolder);
+            ctx.executeQueryAsync(function () {
+                deferred.resolve(curFolder);
+            }, function () {
+                deferred.reject('Unable to create folder in ' + listTitle);
+            });
+            return deferred.promise;
+        };
+        var createItem = function (data) {
+            return createItemCustom(data, Session.getListTitle(), function (item) {
+                var oData = item.get_objectData();
+                var id = Session.isSp2013 ? id = oData.get_properties().Id :
+                    oData.$X_0.get_identity().split(',')[0].split('item')[1].substring(1);
+                Session.setItemId(id);
+            });
+        };
+        var createItemCustom = function (data, listTitle, success) {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var item = ctx.get_web().get_lists().getByTitle(listTitle).addItem();
+            parseDataToItem(data, item);
+            ctx.load(item);
+            ctx.executeQueryAsync(function () {
+                if (success)
+                    success(item);
+                deferred.resolve(item);
+            }, function (e) {
+                deferred.reject(e);
+            });
+            return deferred.promise;
+        };
+        var getAttachment = function () {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var attachmentFolder = ctx.get_web().getFolderByServerRelativeUrl('Lists/' + Session.getListTitle() + '/Attachments/' + Session.getItemId());
+            var attachmentFiles = attachmentFolder.get_files();
+            ctx.load(attachmentFiles);
+            ctx.executeQueryAsync(function () {
+                var file = attachmentFiles.getItemAtIndex(0);
+                var name = file.get_name();
+                var url = file.get_serverRelativeUrl();
+                var attach = { name: name, url: url };
+                deferred.resolve(attach);
+            });
+            return deferred.promise;
+        };
+        var getCurrentItem = function () {
+            var deferred = $q.defer();
+            SP.SOD.executeOrDelayUntilScriptLoaded(function () {
+                var ctx = SP.ClientContext.get_current();
+                var item = ctx.get_web().get_lists().getByTitle(Session.getListTitle()).getItemById(Session.getItemId());
+                ctx.load(item);
+                ctx.executeQueryAsync(function () {
+                    var obj = parseItemToData(item);
+                    deferred.resolve(obj);
+                }, function (e) {
+                    deferred.reject(e);
+                });
+            }, 'SP.js');
+            return deferred.promise;
+        };
+        var renameFolder = function (listTitle, oldTitle, newTitle) {
+            var item;
+            var deferred = $q.defer();
+            var ctx = new SP.ClientContext.get_current();
+            var items = ctx.get_web().get_lists().getByTitle(listTitle).getItems(SP.CamlQuery.createAllFoldersQuery());
+            ctx.load(items);
+            ctx.executeQueryAsync(function () {
+                var item;
+                for (var i = 0; i < items.get_count() ; i++) {
+                    item = items.getItemAtIndex(i);
+                    if (item.get_fieldValues().FileLeafRef == oldTitle) {
+                        item.set_item("FileLeafRef", newTitle);
+                        item.update();
+                    }
+                }
+                ctx.executeQueryAsync(function () {
+                    deferred.resolve(item);
+                }, function (e) {
+                    deferred.reject(e);
+                });
+            });
+            return deferred.promise;
+        };
+        var updateItem = function (data) {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var item = ctx.get_web().get_lists().getByTitle(Session.getListTitle()).getItemById(Session.getItemId());
+            parseDataToItem(data, item);
+            ctx.load(item);
+            ctx.executeQueryAsync(function () {
+                deferred.resolve(item);
+            }, function (e) {
+                alert(e.ErrorMessage)
+                deferred.reject(e);
+            });
+            return deferred.promise;
+        };
+        var deleteItem = function (listTitle, id) {
+            var deferred = $q.defer();
+            var ctx = SP.ClientContext.get_current();
+            var item = ctx.get_web().get_lists().getByTitle(listTitle).getItemById(id);
+            item.deleteObject();
+            ctx.executeQueryAsync(function () {
+                deferred.resolve();
+            }, function (e) {
+                deferred.reject(e);
+            });
+            return deferred.promise;
+        };
+        return {
+            fields: fields,
+            getAllItems: getAllItems,
+            createFolder: createFolder,
+            createItem: createItem,
+            createItemCustom: createItemCustom,
+            deleteItem: deleteItem,
+            getAttachment: getAttachment,
+            getCurrentItem: getCurrentItem,
+            renameFolder: renameFolder,
+            updateItem: updateItem,
+            parseField: parseField,
+            parseItemToData: parseItemToData
+        };
+    });
+    app.factory('UserProfileFactory', function ($q, Settings, Session, UtilFactory) {
+        var getCurrentUser = function () {
+            var deferred = $q.defer();
+            SP.SOD.executeOrDelayUntilScriptLoaded(function () {
+                var context = new SP.ClientContext.get_current();
+                var web = context.get_web();
+                var currentUser = web.get_currentUser();
+                currentUser.retrieve();
+                context.load(web);
+                context.executeQueryAsync(
+                    function () {
+                        var userObject = web.get_currentUser();
+                        var title = userObject.get_title();
+                        var id = userObject.get_id();
+                        var user = { name: UtilFactory.formatName(title), id: id, title: title };
+                        Session.setCurrentUser(user);
+                        deferred.resolve(user);
+                    },
+                    function () {
+                        console.log('Error: ' + args.get_message() + '\n' + args.get_stackTrace());
+                    }
+                );
+            }, 'SP.js');
+            return deferred.promise;
+        };
+        var checkUserAdmin = function (user) {
+            var deferred = $q.defer();
+            SP.SOD.executeOrDelayUntilScriptLoaded(function () {
+                try {
+                    var ctx = SP.ClientContext.get_current();
+                    var group = ctx.get_web().get_siteGroups().getById(Settings.adminGroupid);
+                    ctx.load(group, 'Users');
+                    ctx.executeQueryAsync(
+                        function (sender, args) {
+                            var found = false;
+                            var e = group.get_users().getEnumerator();
+                            while (e.moveNext()) {
+                                var admin = e.get_current();
+                                if (admin.get_title() == user.title) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            deferred.resolve(found);
+                        },
+                        function (e) {
+                            deferred.resolve(false);
+                        });
+                } catch (e) {
+                    deferred.resolve(false);
+                }
+            }, 'SP.js');
+            return deferred.promise;
+        }
+        return {
+            getCurrentUser: getCurrentUser,
+            checkUserAdmin: checkUserAdmin
+        };
+    });
+    app.factory('UtilFactory', function () {
+        var getUrlParameterByName = function (name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+        var formatName = function (n) {
+            var n = n.split('(')[0].split(',');
+            return (n[1] ? n[1].trim() + ' ' : '') + n[0];
+        };
+        var getIndexByProp = function (array, prop, value) {
+            for (var i = 0; i < array.length; i += 1) {
+                if (array[i][prop] === value) return i;
+            }
+            return -1;
+        };
+        return {
+            getIndexByProp: getIndexByProp,
+            getUrlParameterByName: getUrlParameterByName,
+            formatName: formatName
+        }
+    });
+    app.factory('SoapFactory', function ($q, Session, Settings) {
+        return {
+            deleteAttachment: function (file) {
+                var deferred = $q.defer();
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open('POST', Session.getSiteUrl() + '/_vti_bin/Lists.asmx', true);
+                xmlhttp.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/sharepoint/soap/DeleteAttachment");
+                xmlhttp.setRequestHeader("Content-Type", 'text/xml; charset="utf-8"');
+
+                var url = Session.getOriginUrl() + file.url;
+                var cleanUrl = url.replace(/([^:]\/)\/+/g, "$1");
+
+                var sr =
+                    '<?xml version="1.0" encoding="utf-8"?>' +
+                    '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+                        '<soap:Body>' +
+                        '<DeleteAttachment xmlns="http://schemas.microsoft.com/sharepoint/soap/">' +
+                                '<listName>' + Session.getListTitle() + '</listName>' +
+                                '<listItemID>' + Session.getItemId() + '</listItemID>' +
+                                '<url>' + cleanUrl + '</url>' +
+                            '</DeleteAttachment>' +
+                        '</soap:Body>' +
+                    '</soap:Envelope>';
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4) {
+                        if (xmlhttp.status == 200) {
+                            console.log(xmlhttp.responseText);
+                            deferred.resolve(xmlhttp.responseText);
+                        }
+                    }
+                    // TODO: add reject promise
+                }
+                xmlhttp.send(sr);
+                return deferred.promise;
+            },
+            postItemAttachment: function (filename, binaryString) {
+                var deferred = $q.defer();
+                var xmlhttp = new XMLHttpRequest();
+                var data = binaryString.split(',')[1];
+                var url = Session.getSiteUrl() + '/_vti_bin/Lists.asmx';
+                var cleanUrl = url.replace(/([^:]\/)\/+/g, "$1");
+
+                xmlhttp.open('POST', cleanUrl, true);
+                xmlhttp.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/sharepoint/soap/AddAttachment");
+                xmlhttp.setRequestHeader("Content-Type", 'text/xml; charset="utf-8"');
+
+                var sr =
+                    '<?xml version="1.0" encoding="utf-8"?>' +
+                    '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+                        '<soap:Body>' +
+                        '<AddAttachment xmlns="http://schemas.microsoft.com/sharepoint/soap/">' +
+                            '<listName>' + Session.getListTitle() + '</listName>' +
+                            '<listItemID>' + Session.getItemId() + '</listItemID>' +
+                            '<fileName>' + filename + '</fileName>' +
+                            '<attachment>' + data + '</attachment>' +
+                        '</AddAttachment>' +
+                        '</soap:Body>' +
+                    '</soap:Envelope>';
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4) {
+                        if (xmlhttp.status == 200) {
+                            deferred.resolve(xmlhttp.responseText);
+                        }
+                    }
+
+                    // TODO: add reject promise
+                }
+                xmlhttp.send(sr);
+                return deferred.promise;
+            },
+            postDocument: function (filename, folder, binaryString) {
+                var cleanUrl = function (u) { return u.replace(/([^:]\/)\/+/g, "$1") };
+                var deferred = $q.defer();
+                var xmlhttp = new XMLHttpRequest();
+                var data = binaryString.split(',')[1];
+                var serviceUrl = cleanUrl(Session.getSiteUrl() + '/_vti_bin/Copy.asmx');
+                var fileUrl = cleanUrl(Session.getSiteUrl() + '/' + Settings.documentLibraryName + '/' + folder + '/' + filename);
+                var title = filename.replace(/\.[^/.]+$/, "");
+
+                xmlhttp.open('POST', serviceUrl, true);
+                xmlhttp.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/sharepoint/soap/CopyIntoItems");
+                xmlhttp.setRequestHeader("Content-Type", 'text/xml; charset="utf-8"');
+
+                var sr = '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> \
+                    <soap:Body>\
+                        <CopyIntoItems xmlns="http://schemas.microsoft.com/sharepoint/soap/">\
+                            <SourceUrl>' + filename + '</SourceUrl>\
+                                <DestinationUrls>\
+                                    <string>' + fileUrl + '</string>\
+                                </DestinationUrls>\
+                                <Fields>\
+                                    <FieldInformation Type="Text" DisplayName="Title" InternalName="Title" Value="' + title + '"  />\
+                                </Fields>\
+                            <Stream>' + data + '</Stream>\
+                        </CopyIntoItems>\
+                    </soap:Body>\
+                </soap:Envelope>';
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4) {
+                        if (xmlhttp.status == 200) {
+                            deferred.resolve(xmlhttp.responseText);
+                        }
+                    }
+                    // TODO: add reject promise
+                }
+                xmlhttp.send(sr);
+                return deferred.promise;
+            }
+        }
+    });
+
+    // CONTROLLERS
+    app.controller('DocumentTracker', function ($scope, UserProfileFactory, ListDataFactory, UtilFactory, SoapFactory, Session, $q, $timeout, Settings) {
+        window.root = $scope;
+
+        // Utils
+        var getCurrentDate = function () {
+            var date = new Date();
+            return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+        };
+        var loadingManager = function () {
+            var _this = this;
+            _this.all = false;
+            _this.check = function (v) {
+                _this[v] = true;
+                for (var k in _this) {
+                    var res = true;
+                    if (typeof $scope.loaded[k] == "boolean" && k != "all") {
+                        res = res && $scope.loaded[k];
+                    }
+                    $scope.loaded.all = res;
+                }
+            };
+            _this.add = function (k) {
+                _this[k] = false;
+            }
+            return _this;
+        };
+        var setCurrentEmailReceiver = function () {
+            var i = UtilFactory.getIndexByProp($scope.session.allApproversRaw, 'name', $scope.data.currentApprover.name);
+            var approver = $scope.session.allApproversRaw[i];
+            $scope.data.currentEmailReceiver = approver.poc ? approver.poc : $scope.data.currentApprover;
+            $scope.data.isPoc = approver.poc ? 1 : 0;
+        };
+
+        // Properties
+        $scope.data = {};
+        $scope.session = {};
+        $scope.session.submitted = false;
+        $scope.data.status = 'Draft';
+        $scope.data.isParallel = 'No';
+        $scope.session.today = new Date();
+        $scope.loaded = new loadingManager();
+        $scope.session.isViewMode = Session.isViewMode;
+        $scope.session.webUrl = Session.getSiteUrl();
+        $scope.session.settings = Settings;
+        $scope.modalShown = false;
+
+        // Methods
+        function buildCommentTable() {
+            $scope.data.commentTable = $scope.data.approvers.map(function (user) {
+                var oldComments = $scope.data.comments.filter(function (comment) {
+                    return comment.name.indexOf(user.name) > -1;
+                });
+                var name = oldComments.length > 0 ? oldComments[0].name : user.name;
+                name = $scope.session.isApprover && $scope.data.status == 'In Process' && ($scope.session.signer.indexOf(name) > -1 || $scope.session.currentUser.name == name)
+                    ? $scope.session.signer : name;
+                var comment = oldComments.length > 0 ? oldComments[0].comment : "";
+                var date = oldComments.length > 0 ? oldComments[0].date : "";
+                return {
+                    date: date,
+                    name: name,
+                    comment: comment,
+                }
+            });
+        };
+        function getCurrentUser() {
+            $scope.loaded.add('currentUser');
+            var promise = UserProfileFactory.getCurrentUser().then(UserProfileFactory.checkUserAdmin);
+            promise.then(function (isAdmin) {
+                $scope.session.currentUser = Session.getCurrentUser();
+                $scope.session.isCreator = false;
+                $scope.session.isEditor = false;
+                $scope.session.isApprover = false;
+                $scope.session.isAdmin = isAdmin;
+                $scope.loaded.check('currentUser');
+
+                // State and Editor
+                if ($scope.data.status == 'Draft') {
+                    $scope.data.creator = $scope.session.currentUser;
+                }
+                else if ($scope.data.status == "New" && $scope.data.creator.name != $scope.session.currentUser.name) {
+                    $scope.data.editor = $scope.session.currentUser;
+                }
+
+                // Creator and Editor
+                if ($scope.data.creator && $scope.data.creator.name == $scope.session.currentUser.name) {
+                    $scope.session.isCreator = true;
+                } else
+                    if ($scope.data.editor && $scope.data.editor.name == $scope.session.currentUser.name) {
+                        $scope.session.isEditor = true;
+                    }
+
+                // POC
+                $scope.session.pocOf = "";
+                $scope.session.signer = $scope.session.currentUser.name
+                var user = $scope.session.allApproversRaw.filter(function (f) { return f.poc && f.poc.name == $scope.session.currentUser.name })[0];
+                if (user) {
+                    $scope.session.pocOf = user.name;
+                    $scope.session.signer = $scope.session.signer + ' on behalf of ' + user.name;
+                }
+
+                // Approver
+                if ($scope.data.isParallel != "Yes") {
+                    console.log($scope.data.currentApprover, $scope.data.currentEmailReceiver)
+                    if ($scope.data.currentApprover && $scope.data.currentApprover.name == $scope.session.currentUser.name ||
+                    $scope.data.currentEmailReceiver && $scope.data.currentEmailReceiver.name == $scope.session.currentUser.name) {
+                        $scope.session.isApprover = true;
+                    }
+                } else {
+                    $scope.session.isApprover = $scope.data.approvers.filter(function (appr) {
+                        return $scope.session.signer.indexOf(appr.name) > -1;
+                    }).length > 0;
+                }
+            });
+            return promise;
+        }
+        function getAllApprovers() {
+            $scope.loaded.add('allApprovers');
+            var promise = ListDataFactory.getAllItems(Settings.approversListName);
+            promise.then(function (items) {
+                $scope.loaded.check('allApprovers');
+                var arr = [];
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    var approver = ListDataFactory.parseField(item, ListDataFactory.fields.approver);
+                    if (!approver) continue
+                    approver.poc = ListDataFactory.parseField(item, ListDataFactory.fields.poc);
+                    arr.push(approver);
+                }
+                $scope.session.allApproversRaw = angular.copy(arr);
+                if ($scope.data.approvers) {
+                    arr = arr.filter(function (el) {
+                        return $scope.data.approvers.map(function (e) { return e.name; }).indexOf(el.name) < 0;
+                    });
+                }
+                $scope.session.allApprovers = arr;
+            });
+            return promise;
+        }
+
+        $scope.constructor = function () {
+            getAllApprovers().then(function () {
+                if (Session.isEditMode) {
+                    ListDataFactory.getCurrentItem().then(function (obj) {
+                        $scope.data = angular.merge($scope.data, obj);
+                        $scope.data.attachmentUrl = $scope.data.attachmentTitle ? Session.getSiteUrl() + '/' + Settings.documentLibraryName + '/' + Settings.documentFilterQuery + $scope.data.attachmentTitle.replace(/\.[^/.]+$/, "") : '';
+                        $scope.data.attachmentIsPdf = $scope.data.attachmentTitle && $scope.data.attachmentTitle.endsWith('.pdf');
+                        $scope.master = angular.copy($scope.data);
+                        getCurrentUser().then(buildCommentTable);
+                    });
+                } else {
+                    getCurrentUser();
+                }
+            });
+        };
+        $scope.goBackToList = function () {
+            var s = window.location.href;
+            var i = s.indexOf('/NewForm');
+            if (i == -1) i = s.indexOf('/EditForm');
+            var x = s.substr(0, i);
+            window.location = x;
+        };
+        $scope.handleAttachments = function () {
+            var timestamp;
+            var uploadAttachment = function () {
+                $scope.data.folderTempName = $scope.data.oldAttachmentTitle ? $scope.data.oldAttachmentTitle.split('/')[0] : timestamp;
+                $scope.data.attachmentTitle = $scope.data.folderTempName + '/' + $scope.data.attachment.filename;
+                return SoapFactory.postDocument($scope.data.attachment.filename, $scope.data.folderTempName, $scope.data.attachment.data);
+            };
+            var deleteAtt = function () {
+                return $scope.removeAttachment();
+            };
+
+            if ($scope.data.distribution && $scope.data.distribution == 'Attached')
+                if ($scope.data.attachment && ($scope.data.status == 'New' || $scope.data.status == 'Reverted' || $scope.data.status == 'In Process')) {
+                    if ($scope.data.attachmentTitle) {
+                        return deleteAtt().then(uploadAttachment);
+                    } else {
+                        timestamp = new Date().getTime();
+                        $scope.data.folderTempName = timestamp;
+                        return ListDataFactory.createFolder(Settings.documentLibraryName, $scope.data.folderTempName).then(uploadAttachment);
+                    }
+                }
+
+            return $q.when([]);
+        };
+        $scope.redirectEdit = function () {
+            window.location = Session.getSiteUrl() + '/Lists/' + Session.getListTitle() + '/EditForm.aspx?ID=' + $scope.data.id
+        };
+        $scope.removeAttachment = function () {
+            function deleteById(items) {
+                var id = null;
+                for (var i = 0; i < items.length; i++)
+                    if (items[i].FileRef == _spPageContextInfo.webServerRelativeUrl + '/' + Settings.documentLibraryName + '/' + $scope.data.attachmentTitle)
+                        id = items[i].ID;
+                $scope.data.oldAttachmentTitle = $scope.data.attachmentTitle;
+                $scope.data.attachmentTitle = "";
+                return ListDataFactory.deleteItem(Settings.documentLibraryName, id);
+            }
+            return ListDataFactory.getAllItems(Settings.documentLibraryName).then(deleteById);
+            //return ListDataFactory.getAllItems(Settings.documentLibraryName, 'Include(Title, ID, FileRef)').then(deleteById);
+        };
+        $scope.saveComment = function () {
+            $scope.data.comments.push({ name: $scope.session.signer, comment: $scope.data.newComment, date: getCurrentDate() });
+        };
+        $scope.showAlert = function (msg, stayOnPage) {
+            $scope.modalMessage = msg;
+            $scope.modalStay = !!stayOnPage;
+            $scope.modalShown = !$scope.modalShown;
+            return $q.when([]);
+        };
+        $scope.stopTracking = function (omitAttachment) {
+            $scope.data.previousAssignee = "";
+            $scope.data.currentAssignee = "";
+            if ($scope.data.distribution == 'Attached' && !!!omitAttachment)
+                // return $scope.removeAttachment().then($scope.write).then($scope.goBackToList)
+                return $scope.write().then($scope.goBackToList);
+            else
+                return $scope.write();
+        };
+        $scope.toggleModal = function () {
+            $scope.modalShown = !$scope.modalShown;
+        };
+        $scope.write = function () {
+            var promise = Session.isEditMode ? ListDataFactory.updateItem($scope.data) : ListDataFactory.createItem($scope.data);
+            return promise.then(function (item) {
+                $scope.data.id = item.get_fieldValues().ID;
+                if ($scope.data.folderTempName) 
+                return ListDataFactory.renameFolder(Settings.documentLibraryName, $scope.data.folderTempName, $scope.data.id).then(function () {
+                    return ListDataFactory.updateItem({ attachmentTitle: $scope.data.id + '/' + $scope.data.attachment.filename });
+                });
+            });
+        };
+
+        // Buttons actions
+        $scope.approve = function () {
+            $scope.saveComment();
+			var isll = $scope.data.isParallel == "Yes";
+            var index = UtilFactory.getIndexByProp($scope.data.approvers, 'name', $scope.data.currentApprover.name);
+            if (index < $scope.data.approvers.length - 1) {
+                $scope.data.previousAssignee = isll ? null : $scope.data.currentApprover.name;
+                $scope.data.currentApprover = $scope.data.approvers[index + 1];
+                $scope.data.currentAssignee = isll ? null : $scope.data.currentApprover.name;
+				$scope.data.nextAssignee = !isll && index < $scope.data.approvers.length - 2 ? $scope.data.approvers[index + 2].name : null;
+                setCurrentEmailReceiver();
+            } else {
+                $scope.data.previousAssignee = isll ? null : $scope.data.approvers.length > 1 ? $scope.data.approvers[index - 1].name : null;
+                $scope.data.currentAssignee = $scope.data.creator.name;
+                $scope.data.currentApprover = null;
+				$scope.data.nextAssignee = null;
+                $scope.data.currentEmailReceiver = null;
+                $scope.data.status = "Complete";
+            }
+            $scope.data.lastSigner = $scope.session.signer;
+            $scope.session.submitted = true;
+            $scope.data.wfCounter = -1;
+            $scope.write().then(function () { $scope.showAlert("Your Tracker Item was successfully Approved and has moved forward in the workflow.") });
+        };
+        $scope.cancel = function () {
+            $scope.goBackToList();
+        };
+        $scope.closeOut = function () {
+            $scope.data.status = "Closed";
+            $scope.session.submitted = true;
+            $scope.data.closedOutDate = new Date();
+            $scope.stopTracking().then(function () { $scope.showAlert("Your Tracker Item was successfully closed out.") });
+        };
+        $scope.disapprove = function () {
+            $scope.saveComment();
+            $scope.data.status = "Denied";
+            $scope.session.submitted = true;
+            $scope.data.attachment = null;
+            $scope.stopTracking().then(function () { $scope.showAlert("Your Tracker Item has been successfully Disapproved and is going back to the initiator.") });
+        };
+        $scope.initiate = function () {
+            $scope.data.currentApprover = $scope.data.approvers[0];
+            $scope.data.currentAssignee = $scope.data.isParallel == "Yes" ? null : $scope.data.currentApprover.name;
+			$scope.data.nextAssignee = $scope.data.isParallel != "Yes" && $scope.data.approvers.length > 1 ? $scope.data.approvers[1].name : null;
+            setCurrentEmailReceiver();
+            $scope.data.initDate = new Date();
+            $scope.data.status = "In Process";
+            $scope.data.comments = [];
+            $scope.session.submitted = true;
+            $scope.data.wfCounter = -1;
+            $scope.handleAttachments().then($scope.write).then(function () { $scope.showAlert("Your Tracker Item was successfully initiated.") });
+        };
+        $scope.recall = function () {
+            $scope.data.recalledBy = $scope.session.currentUser;
+            $scope.data.status = "Recalled";
+            $scope.session.submitted = true;
+            $scope.data.attachment = null;
+            $scope.stopTracking().then(function () { $scope.showAlert("Your Tracker Item was successfully recalled.") });
+        };
+        $scope.remove = function () {
+            $scope.data.attachment = null;
+            $scope.data.status = "Cancelled";
+            $scope.session.submitted = true;
+            $scope.stopTracking().then(function () { $scope.showAlert("Your Tracker Item was successfully removed from the system.") });
+        };
+        $scope.revert = function () {
+            $scope.saveComment();
+            $scope.data.attachment = null;
+            $scope.data.status = "Reverted";
+            $scope.session.submitted = true;
+            $scope.stopTracking(true).then(function () { $scope.showAlert("Your Tracker Item was successfully Reverted and is going back to the initiator.") });
+        };
+        $scope.save = function () {
+            $scope.data.status = "New";
+            $scope.session.submitted = true;
+            $scope.handleAttachments()
+                .then($scope.write)
+                .then(function () {
+                    $scope.redirectEdit();
+                })
+                // .then(function () { $scope.showAlert("Document Tracker Item Saved")});
+        };
+
+        // Constructor
+        $scope.constructor();
+    });
+
+    // DIRECTIVES
+    app.directive('myDoubleBox', function ($timeout, UtilFactory) {
+        return {
+            restrict: 'E',
+            scope: {
+                ngModel: '=',
+                options: '=optionSource'
+            },
+            template: '<table class="dt-ctrl-approvers" border="1" align="center" style="border-collapse:collapse;"><tr valign="top"><td>' +
+                '<select size="8" ng-dblclick="onClickRight()" ng-click="onClickSL()">' +
+                    '<option ng-repeat="option1 in options | orderBy: \'name\' " value="{{option1.id}}">{{option1.name}}</option>' +
+                '</select></td><td valign="middle">' +
+                    '<input type="button" ng-click="onClickRight()" value=">" title="Move selected person right" ng-disabled="options.length==0 || rDisabled" style="width: 80px"/><br /><br />' +
+                    '<input type="button" ng-click="onClickLeft()" value="<" title="Move selected person left" ng-disabled="ngModel.length==0 || lDisabled" style="width: 80px"/></td><td>' +
+                '<select size="8" ng-dblclick="onClickLeft()" ng-click="onClickSR()" >' +
+                    '<option ng-repeat="option2 in ngModel" value="{{option2.id}}">{{option2.name}}</option>' +
+                '</select></td></tr><tr><td></td><td></td><td>' +
+                    '<input type="button" value="Move Up" ng-click="moveUpDown(false)" title="Move the selected recipient up in the routing slip." ng-disabled="ngModel.length<=1 || uDisabled" />' +
+                    '<input type="button" value="Move Down" ng-click="moveUpDown(true)" title="Move the selected recipient down in the routing slip." ng-disabled="ngModel.length<=1 || dDisabled" />' +
+                '</td></tr></table>',
+            controller: ['$scope', '$element', function (scope, element) {
+                scope.ngModel = [];
+                var sels = element.find('select');
+                var selA = sels[0];
+                var selB = sels[1];
+
+                scope.rDisabled = true;
+                scope.lDisabled = true;
+                scope.uDisabled = true;
+                scope.dDisabled = true;
+
+                scope.onClickSL = function () {
+                    scope.rDisabled = selA.selectedIndex == -1;
+                }
+
+                scope.onClickSR = function () {
+                    scope.lDisabled = selB.selectedIndex == -1;
+                    scope.dDisabled = selB.selectedIndex == -1 || selB.selectedIndex == selB.length - 1;
+                    scope.uDisabled = selB.selectedIndex < 1;
+                }
+
+                scope.moveUpDown = function (isDown) {
+                    var index = selB.selectedIndex;
+                    if (index == -1) { console.log("Please select an option to move."); return; }
+                    var temp = scope.ngModel[index];
+                    if (isDown) {
+                        scope.ngModel[index] = scope.ngModel[index + 1];
+                        scope.ngModel[index + 1] = temp;
+                        scope.dDisabled = index >= selB.length - 2;
+                        scope.uDisabled = false;
+                    } else {
+                        scope.ngModel[index] = scope.ngModel[index - 1];
+                        scope.ngModel[index - 1] = temp;
+                        scope.uDisabled = index < 2;
+                        scope.dDisabled = false;
+                    }
+                }
+
+                scope.onClickLR = function (sel, arrFrom, arrTo) {
+                    if (sel.selectedIndex < 0) { console.log("Please select an option to move."); return; }
+                    var name = sel.options[sel.selectedIndex].text;
+                    var index = UtilFactory.getIndexByProp(arrFrom, 'name', name);
+                    if (index === -1) { console.log("Please select an option to move."); return; }
+                    var item = arrFrom[index];
+                    arrTo.push(item);
+                    arrFrom.splice(index, 1);
+                    sel.selectedIndex = -1;
+                }
+
+                scope.onClickRight = function () {
+                    scope.onClickLR(selA, scope.options, scope.ngModel);
+                    scope.rDisabled = true;
+                };
+                scope.onClickLeft = function () {
+                    scope.onClickLR(selB, scope.ngModel, scope.options);
+                    scope.lDisabled = true;
+                    scope.uDisabled = true;
+                    scope.dDisabled = true;
+                };
+            }]
+        };
+    });
+    app.directive("datepickr", function () {
+        return {
+            require: "ngModel",
+            restrict: "AE",
+            scope: {
+                ngModel: "=",
+                cleanDate: "="
+            },
+            template: '<input ng-model="dueDate" ng-change="onDateChange()" type="text" readonly="true" class="dt-input-calendar" size="23">\
+                        <div style="position: relative"></div>',
+            controller: ['$scope', '$element', function (scope, element) {
+                var config = {
+                    'dateFormat': 'm/d/Y'
+                }
+                new datepickr(element.find('input')[0], config, element.find('div')[0]);
+            }],
+            link: function (scope, element, attrs, ngModel) {
+                scope.onDateChange = function () {
+                    ngModel.$setViewValue(scope.dueDate);
+                    scope.cleanDate = new Date(scope.dueDate);
+                    scope.cleanDate.setHours(23);
+                    scope.cleanDate.setMinutes(59);
+                };
+                ngModel.$render = function () {
+                    if (!ngModel.$modelValue) return;
+                    var date = new Date(ngModel.$modelValue);
+                    var newDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+                    ngModel.$modelValue = newDate;
+                    scope.dueDate = ngModel.$modelValue;
+                };
+            }
+        };
+    });
+    app.directive("fileread", [function () {
+        return {
+            scope: {
+                fileread: "="
+            },
+            link: function (scope, element, attributes, ngModel) {
+                element.bind("change", function (changeEvent) {
+                    var reader = new FileReader();
+                    var filename = changeEvent.target.files[0].name;
+                    reader.onload = function (loadEvent) {
+                        scope.$apply(function () {
+                            scope.fileread = { filename: filename, data: loadEvent.target.result };
+                        });
+                    }
+                    reader.readAsDataURL(changeEvent.target.files[0]);
+                });
+            }
+        }
+    }]);
+    app.directive('myComments', function () {
+        return {
+            require: '?ngModel',
+            template: '<p ng-repeat="comment in data.comments">{{::comment.Name}}: {{::comment.Comment}}</p>',
+        };
+    });
+    app.directive("superSelect", function (Settings, ListDataFactory) {
+        return {
+            restrict: 'E',
+            require: "ngModel",
+            scope: {
+                ngModel: '=',
+                allOptions: '=',
+                sourceListName: '@sourceListName'
+            },
+            link: function (scope, element, attrs, ngModel) {
+                scope.addOption = function () {
+                    if (scope.allOptions.indexOf(scope.newOption) > -1) return;
+                    if (typeof scope.newOption == 'undefined' || scope.newOption == '') return;
+                    scope.allOptions.push(scope.newOption);
+                    scope.ngModel = scope.newOption;
+                    ListDataFactory.createItemCustom({ title: scope.newOption }, Settings[scope.sourceListName], function () {
+                        scope.newOption = "";
+                        scope.$apply();
+                    });
+
+                }
+            },
+            controller: function ($scope) {
+                ListDataFactory.getAllItems(Settings.documentTypeListName).then(function (items) {
+                    $scope.allOptions = items.map(function (v) { return v['Title'] });
+                });
+            },
+            template:
+                '<select class="dt-select-dropdown" ng-model="ngModel" ng-options="item as item for item in allOptions | orderBy" required>\
+                </select>\
+                <span  class="dt-label" >Other: </span>\
+                <input type="text" ng-model="newOption"></input>\
+                <input ng-disabled="!newOption || newOption.length == 0" type="button" ng-click="addOption()" value="Add" title="Add custom value to the dropbox"></input>'
+        }
+    });
+    app.directive('modalDialog', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                show: '=',
+                message: '=',
+                action: '='
+            },
+            replace: true, // Replace with the template below
+            transclude: true, // we want to insert custom content inside the directive
+            link: function (scope, element, attrs) {
+                scope.hideModal = function () {
+                    scope.show = false;
+                    scope.action();
+                };
+            },
+            template:
+                '<div class="ng-modal" ng-show="show">\
+                    <div class="ng-modal-overlay" ng-click="hideModal()">\
+                        <div class="ng-modal-dialog" >\
+                            <p>{{message}}</p>\
+                            <input type="button" class="ng-modal-close" ng-click="hideModal()" value="OK" />\
+                            <div class="ng-modal-dialog-content" ng-transclude></div>\
+                        </div>\
+                    </div>\
+                </div>'
+        };
+    });
+</script>
